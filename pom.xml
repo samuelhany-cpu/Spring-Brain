@@ -15,6 +15,7 @@
 
     <modules>
         <module>spring-brain-core</module>
+        <module>spring-brain-viewer</module>
         <module>spring-brain-cli</module>
         <module>spring-brain-server</module>
     </modules>

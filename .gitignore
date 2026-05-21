@@ -7,3 +7,7 @@ target/
 *.iml
 .vscode/
 .DS_Store
+spring-brain-viewer/node_modules/
+spring-brain-viewer/dist/
+.superpowers/
+spring-brain-cli/src/main/resources/viewer/
