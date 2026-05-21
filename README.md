@@ -41,6 +41,61 @@ mvn test
 
 ---
 
+## Usage
+
+### Basic scan
+
+Point `--path` at any Spring Boot project root:
+
+```bash
+java -jar spring-brain-cli/target/spring-brain-cli-0.1.0.jar scan --path /path/to/your-spring-app
+```
+
+Example output printed to the terminal:
+
+```text
+Spring Brain — Static Analysis
+================================
+Project path : /path/to/your-spring-app
+Output path  : /path/to/your-spring-app/.spring-brain
+
+Scanning sources...
+Building graph...
+Running diagnostics...
+
+Results
+-------
+  Controllers : 5
+  Services    : 4
+  Repositories: 4
+  Entities    : 6
+  Routes      : 18
+  Errors      : 0
+  Warnings    : 2
+
+Output written to: /path/to/your-spring-app/.spring-brain
+```
+
+### Custom output directory
+
+```bash
+java -jar spring-brain-cli/target/spring-brain-cli-0.1.0.jar scan \
+  --path /path/to/your-spring-app \
+  --output /tmp/my-report
+```
+
+### Fail the build on errors (CI usage)
+
+```bash
+java -jar spring-brain-cli/target/spring-brain-cli-0.1.0.jar scan \
+  --path /path/to/your-spring-app \
+  --fail-on-error
+```
+
+Exits with code `2` if any `ERROR` diagnostics are found. Useful in CI pipelines to enforce architecture rules.
+
+---
+
 ## Output
 
 After a successful scan, Spring Brain writes to `.spring-brain/` (or `--output <dir>`):

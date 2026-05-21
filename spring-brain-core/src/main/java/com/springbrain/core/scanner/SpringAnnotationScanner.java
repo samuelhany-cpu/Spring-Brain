@@ -1,5 +1,6 @@
 package com.springbrain.core.scanner;
 
+import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.NodeList;
@@ -53,6 +54,9 @@ public final class SpringAnnotationScanner {
      * Returns a populated {@link ProjectModel}.
      */
     public static ProjectModel scan(Path projectRoot) {
+        StaticJavaParser.getParserConfiguration()
+                .setLanguageLevel(ParserConfiguration.LanguageLevel.JAVA_17);
+
         List<Path> javaFiles = JavaFileDiscovery.discover(projectRoot);
 
         List<ControllerModel> controllers = new ArrayList<>();

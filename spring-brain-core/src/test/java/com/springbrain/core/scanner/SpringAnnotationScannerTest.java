@@ -279,4 +279,14 @@ class SpringAnnotationScannerTest {
         assertThat(model.getConfigPropertyUsages()).allMatch(p ->
                 p.getOwnerQualifiedName().equals("com.example.config.AppConfig"));
     }
+
+    // ── Java 15+ syntax (text blocks) ─────────────────────────────────────────
+
+    @Test
+    void scannerHandlesTextBlockLiterals() throws Exception {
+        ProjectModel model = scanFixture("ServiceWithTextBlock.java");
+
+        assertThat(model.getServices()).hasSize(1);
+        assertThat(model.getServices().get(0).getClassName()).isEqualTo("ServiceWithTextBlock");
+    }
 }
