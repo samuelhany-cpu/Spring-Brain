@@ -8,7 +8,7 @@ import picocli.CommandLine.Command;
         name = SpringBrainVersion.TOOL_NAME,
         version = SpringBrainVersion.VERSION,
         mixinStandardHelpOptions = true,
-        subcommands = {ScanCommand.class},
+        subcommands = {ScanCommand.class, ServeCommand.class},
         description = "Spring Boot architecture intelligence tool. Scans a Spring Boot project and generates a graph, diagnostics, and summary.",
         header = {
                 "",
