@@ -1,11 +1,11 @@
-import React from 'react'
+import type { ReactNode } from 'react'
 import { render, screen } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 
 vi.mock('reactflow', () => ({
   Handle: () => null,
   Position: { Top: 'top', Bottom: 'bottom' },
-  ReactFlowProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  ReactFlowProvider: ({ children }: { children: ReactNode }) => <>{children}</>,
 }))
 
 import { RouteNode } from './RouteNode'
@@ -22,34 +22,36 @@ const nodeData = {
   line: 10,
 }
 
+const baseProps = { id: 'n1', data: nodeData, selected: false }
+
 describe('Node components', () => {
   it('RouteNode renders label', () => {
-    render(<RouteNode id="n1" data={nodeData} type="route" selected={false} borderColor="#388bfd" textColor="#79c0ff" />)
+    render(<RouteNode {...({ ...baseProps, type: 'route' } as any)} />)
     expect(screen.getByText('TestLabel')).toBeInTheDocument()
   })
 
   it('ControllerNode renders label', () => {
-    render(<ControllerNode id="n1" data={nodeData} type="controller" selected={false} borderColor="#f0883e" textColor="#ffa657" />)
+    render(<ControllerNode {...({ ...baseProps, type: 'controller' } as any)} />)
     expect(screen.getByText('TestLabel')).toBeInTheDocument()
   })
 
   it('ServiceNode renders label', () => {
-    render(<ServiceNode id="n1" data={nodeData} type="service" selected={false} borderColor="#3fb950" textColor="#7ee787" />)
+    render(<ServiceNode {...({ ...baseProps, type: 'service' } as any)} />)
     expect(screen.getByText('TestLabel')).toBeInTheDocument()
   })
 
   it('RepositoryNode renders label', () => {
-    render(<RepositoryNode id="n1" data={nodeData} type="repository" selected={false} borderColor="#bc8cff" textColor="#d2a8ff" />)
+    render(<RepositoryNode {...({ ...baseProps, type: 'repository' } as any)} />)
     expect(screen.getByText('TestLabel')).toBeInTheDocument()
   })
 
   it('EntityNode renders label', () => {
-    render(<EntityNode id="n1" data={nodeData} type="entity" selected={false} borderColor="#f778ba" textColor="#f778ba" />)
+    render(<EntityNode {...({ ...baseProps, type: 'entity' } as any)} />)
     expect(screen.getByText('TestLabel')).toBeInTheDocument()
   })
 
   it('ConfigNode renders label', () => {
-    render(<ConfigNode id="n1" data={nodeData} type="config_property" selected={false} borderColor="#e3b341" textColor="#e3b341" />)
+    render(<ConfigNode {...({ ...baseProps, type: 'config_property' } as any)} />)
     expect(screen.getByText('TestLabel')).toBeInTheDocument()
   })
 })

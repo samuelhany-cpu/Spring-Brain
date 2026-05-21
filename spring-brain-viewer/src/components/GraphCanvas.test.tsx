@@ -1,4 +1,4 @@
-import React from 'react'
+import type { ReactNode } from 'react'
 import { render, screen } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import { GraphCanvas } from './GraphCanvas'
@@ -18,7 +18,7 @@ vi.mock('reactflow', () => {
     Background: () => null,
     Controls: () => null,
     MiniMap: () => null,
-    ReactFlowProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+    ReactFlowProvider: ({ children }: { children: ReactNode }) => <>{children}</>,
     useNodesState: (init: unknown[]) => [init, vi.fn(), vi.fn()],
     useEdgesState: (init: unknown[]) => [init, vi.fn(), vi.fn()],
     Position: { Top: 'top', Bottom: 'bottom', Left: 'left', Right: 'right' },

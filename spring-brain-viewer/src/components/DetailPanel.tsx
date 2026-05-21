@@ -1,4 +1,3 @@
-import React from 'react'
 import type { Graph, DiagnosticsReport, LiveStatus } from '../types'
 
 interface Props {

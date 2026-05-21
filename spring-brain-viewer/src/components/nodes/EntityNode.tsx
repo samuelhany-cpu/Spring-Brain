@@ -1,6 +1,7 @@
-import React from 'react'
-import { BaseNode, type BaseNodeProps } from './BaseNode'
+import type { NodeProps } from 'reactflow'
+import { BaseNode } from './BaseNode'
+import type { GraphNode } from '../../types'
 
-export function EntityNode(props: BaseNodeProps) {
+export function EntityNode(props: NodeProps<GraphNode>) {
   return <BaseNode {...props} borderColor="#f778ba" textColor="#f778ba" hasSource={false} />
 }

@@ -1,18 +1,17 @@
-import React from 'react'
 import { Handle, Position } from 'reactflow'
+import type { NodeProps } from 'reactflow'
+import type { GraphNode } from '../../types'
 
-export interface BaseNodeProps {
-  id: string
-  data: { label: string; qualifiedName: string; file: string; line: number }
-  type: string
-  selected: boolean
+export interface BaseNodeColors {
   borderColor: string
   textColor: string
   hasTarget?: boolean
   hasSource?: boolean
 }
 
-export function BaseNode({ data, selected, borderColor, textColor, hasTarget = true, hasSource = true }: BaseNodeProps) {
+export type GraphNodeProps = NodeProps<GraphNode> & BaseNodeColors
+
+export function BaseNode({ data, selected, borderColor, textColor, hasTarget = true, hasSource = true }: GraphNodeProps) {
   return (
     <div
       style={{

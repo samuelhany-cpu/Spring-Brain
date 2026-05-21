@@ -1,6 +1,7 @@
-import React from 'react'
-import { BaseNode, type BaseNodeProps } from './BaseNode'
+import type { NodeProps } from 'reactflow'
+import { BaseNode } from './BaseNode'
+import type { GraphNode } from '../../types'
 
-export function RouteNode(props: BaseNodeProps) {
+export function RouteNode(props: NodeProps<GraphNode>) {
   return <BaseNode {...props} borderColor="#388bfd" textColor="#79c0ff" hasTarget={false} />
 }

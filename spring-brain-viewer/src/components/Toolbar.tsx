@@ -1,4 +1,3 @@
-import React from 'react'
 import type { DiagnosticsReport, NodeType } from '../types'
 
 const ALL_TYPES: NodeType[] = ['route', 'controller', 'service', 'repository', 'entity', 'config_property']

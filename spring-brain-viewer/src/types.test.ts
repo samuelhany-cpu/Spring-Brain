@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import type { GraphNode, GraphEdge, Graph, DiagnosticsReport, Diagnostic, NodeType, LiveStatus } from './types'
+import type { GraphNode, Graph, DiagnosticsReport, Diagnostic, NodeType, LiveStatus } from './types'
 
 describe('types', () => {
   it('NodeType covers all node kinds', () => {
