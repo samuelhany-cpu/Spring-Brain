@@ -24,13 +24,13 @@ mvn package -DskipTests
 ### Run the CLI
 
 ```bash
-java -jar spring-brain-cli/target/spring-brain-cli-0.1.0-SNAPSHOT.jar --help
+java -jar spring-brain-cli/target/spring-brain-cli-0.1.0.jar --help
 ```
 
 ### Scan a Spring Boot project
 
 ```bash
-java -jar spring-brain-cli/target/spring-brain-cli-0.1.0-SNAPSHOT.jar scan --path ./spring-brain-samples/clean-crud-app
+java -jar spring-brain-cli/target/spring-brain-cli-0.1.0.jar scan --path ./spring-brain-samples/clean-crud-app
 ```
 
 ### Run Tests
@@ -41,9 +41,9 @@ mvn test
 
 ---
 
-## Output (Milestone 1+)
+## Output
 
-After a successful scan, Spring Brain writes to `.spring-brain/`:
+After a successful scan, Spring Brain writes to `.spring-brain/` (or `--output <dir>`):
 
 ```text
 .spring-brain/
@@ -51,8 +51,6 @@ After a successful scan, Spring Brain writes to `.spring-brain/`:
 ├── diagnostics.json  ← Broken links and rule violations
 └── summary.md        ← Human-readable report
 ```
-
-> In Milestone 0, the scan command validates the path and prints a placeholder message. Full scanner is Milestone 1.
 
 ---
 
@@ -65,7 +63,12 @@ spring-brain/
 ├── spring-brain-server/     # Planned: local HTTP API
 ├── spring-brain-viewer/     # Planned: React graph viewer
 ├── spring-brain-samples/
-│   └── clean-crud-app/      # Sample CRUD app for scanning
+│   ├── clean-crud-app/                          # Clean reference app (0 diagnostics)
+│   ├── broken-controller-without-service-app/   # Triggers CONTROLLER_WITHOUT_SERVICE
+│   ├── broken-controller-direct-repository-app/ # Triggers CONTROLLER_DIRECT_REPOSITORY
+│   ├── broken-missing-repository-app/           # Triggers MISSING_REPOSITORY_BEAN
+│   ├── broken-repository-entity-mismatch-app/   # Triggers REPOSITORY_ENTITY_MISMATCH
+│   └── broken-config-property-app/              # Triggers MISSING_CONFIG_PROPERTY
 ├── docs/
 │   ├── PRD.md
 │   ├── ARCHITECTURE.md
@@ -126,9 +129,18 @@ spring-brain/
 
 ## Status
 
-**Milestone 0 — Project Bootstrap** ✅
+**v0.1.0 — Release Candidate** ✅
 
-Project compiles, tests pass, CLI skeleton working. Scanner begins in Milestone 1.
+| Milestone | Status |
+|-----------|--------|
+| 0 — Project Bootstrap | ✅ |
+| 1 — Static Scanner | ✅ |
+| 2 — Graph Builder | ✅ |
+| 3 — Broken Link Detector | ✅ |
+| 4 — Summary Report | ✅ |
+| 5 — Release Candidate | ✅ |
+
+124 tests pass. Produces `graph.json`, `diagnostics.json`, and `summary.md` from any Spring Boot source tree.
 
 ---
 
