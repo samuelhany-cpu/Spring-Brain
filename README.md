@@ -6,6 +6,12 @@ Spring Brain is an open-source CLI tool that statically scans a Spring Boot code
 
 ---
 
+## Viewer Preview
+
+![Spring Brain interactive graph viewer](docs/assets/viewer-demo.gif)
+
+---
+
 ## Quick Start
 
 ### Prerequisites
