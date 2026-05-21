@@ -251,4 +251,32 @@ class SpringAnnotationScannerTest {
         ControllerModel controller = model.getControllers().get(0);
         assertThat(controller.getFile().isAbsolute()).isFalse();
     }
+
+    // ── Injected type detection ───────────────────────────────────────────────
+
+    @Test
+    void detectsControllerConstructorInjectedTypes() throws Exception {
+        ProjectModel model = scanFixture("UserController.java");
+
+        ControllerModel controller = model.getControllers().get(0);
+        assertThat(controller.getInjectedTypeNames()).contains("UserService");
+    }
+
+    @Test
+    void detectsServiceConstructorInjectedTypes() throws Exception {
+        ProjectModel model = scanFixture("UserService.java");
+
+        ServiceModel service = model.getServices().get(0);
+        assertThat(service.getInjectedTypeNames()).contains("UserRepository");
+    }
+
+    // ── Config property owner ─────────────────────────────────────────────────
+
+    @Test
+    void configPropertyUsageHasOwnerQualifiedName() throws Exception {
+        ProjectModel model = scanFixture("AppConfig.java");
+
+        assertThat(model.getConfigPropertyUsages()).allMatch(p ->
+                p.getOwnerQualifiedName().equals("com.example.config.AppConfig"));
+    }
 }
