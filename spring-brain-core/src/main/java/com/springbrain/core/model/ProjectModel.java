@@ -12,6 +12,7 @@ public final class ProjectModel {
     private final List<RepositoryModel> repositories;
     private final List<EntityModel> entities;
     private final List<ConfigPropertyUsageModel> configPropertyUsages;
+    private final List<BeanModel> beans;
     private final Set<String> definedConfigKeys;
 
     private ProjectModel(Builder builder) {
@@ -21,6 +22,7 @@ public final class ProjectModel {
         this.repositories = List.copyOf(builder.repositories);
         this.entities = List.copyOf(builder.entities);
         this.configPropertyUsages = List.copyOf(builder.configPropertyUsages);
+        this.beans = List.copyOf(builder.beans);
         this.definedConfigKeys = Set.copyOf(builder.definedConfigKeys);
     }
 
@@ -30,6 +32,7 @@ public final class ProjectModel {
     public List<RepositoryModel> getRepositories() { return repositories; }
     public List<EntityModel> getEntities() { return entities; }
     public List<ConfigPropertyUsageModel> getConfigPropertyUsages() { return configPropertyUsages; }
+    public List<BeanModel> getBeans() { return beans; }
     public Set<String> getDefinedConfigKeys() { return definedConfigKeys; }
 
     public static Builder builder(Path rootPath) {
@@ -43,6 +46,7 @@ public final class ProjectModel {
         private List<RepositoryModel> repositories = List.of();
         private List<EntityModel> entities = List.of();
         private List<ConfigPropertyUsageModel> configPropertyUsages = List.of();
+        private List<BeanModel> beans = List.of();
         private Set<String> definedConfigKeys = Set.of();
 
         private Builder(Path rootPath) {
@@ -63,6 +67,9 @@ public final class ProjectModel {
         }
         public Builder configPropertyUsages(List<ConfigPropertyUsageModel> configPropertyUsages) {
             this.configPropertyUsages = configPropertyUsages; return this;
+        }
+        public Builder beans(List<BeanModel> beans) {
+            this.beans = beans; return this;
         }
         public Builder definedConfigKeys(Set<String> definedConfigKeys) {
             this.definedConfigKeys = definedConfigKeys; return this;

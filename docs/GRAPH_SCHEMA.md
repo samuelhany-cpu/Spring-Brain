@@ -77,6 +77,7 @@ The graph is:
 | `repository` | Spring Data repository interface |
 | `entity` | JPA entity class |
 | `config_property` | Application config property key |
+| `bean` | Spring-managed bean used for generic dependency analysis |
 
 ## 8. Edge Types
 
@@ -98,6 +99,7 @@ The graph is:
 | Repository | `repository:{QUALIFIED_INTERFACE}` | `repository:com.example.UserRepository` |
 | Entity | `entity:{QUALIFIED_CLASS}` | `entity:com.example.User` |
 | Config | `config:{PROPERTY_KEY}` | `config:jwt.secret` |
+| Bean | `bean:{QUALIFIED_CLASS}` | `bean:com.example.UserService` |
 
 ## 10. Sorting Rules
 

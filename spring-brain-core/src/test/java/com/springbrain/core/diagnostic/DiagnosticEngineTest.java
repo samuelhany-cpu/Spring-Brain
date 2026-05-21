@@ -2,6 +2,7 @@ package com.springbrain.core.diagnostic;
 
 import com.springbrain.core.diagnostic.rules.ControllerDirectRepositoryRule;
 import com.springbrain.core.diagnostic.rules.ControllerWithoutServiceRule;
+import com.springbrain.core.diagnostic.rules.CircularDependencyRule;
 import com.springbrain.core.diagnostic.rules.MissingConfigPropertyRule;
 import com.springbrain.core.diagnostic.rules.MissingRepositoryBeanRule;
 import com.springbrain.core.diagnostic.rules.RepositoryEntityMismatchRule;
@@ -92,5 +93,11 @@ class DiagnosticEngineTest {
         assertThat(report.diagnostics()).hasSizeGreaterThanOrEqualTo(2);
         assertThat(report.diagnostics().stream().map(Diagnostic::code))
                 .contains(ControllerWithoutServiceRule.CODE, RepositoryEntityMismatchRule.CODE);
+    }
+
+    @Test
+    void defaultRulesIncludeCircularDependencyRule() {
+        assertThat(DiagnosticEngine.defaultRules().stream().map(DiagnosticRule::code))
+                .contains(CircularDependencyRule.CODE);
     }
 }

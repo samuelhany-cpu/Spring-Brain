@@ -1,12 +1,8 @@
 package com.springbrain.cli;
 
 import com.springbrain.core.diagnostic.DiagnosticEngine;
+import com.springbrain.core.diagnostic.DiagnosticRule;
 import com.springbrain.core.diagnostic.DiagnosticsReport;
-import com.springbrain.core.diagnostic.rules.ControllerDirectRepositoryRule;
-import com.springbrain.core.diagnostic.rules.ControllerWithoutServiceRule;
-import com.springbrain.core.diagnostic.rules.MissingConfigPropertyRule;
-import com.springbrain.core.diagnostic.rules.MissingRepositoryBeanRule;
-import com.springbrain.core.diagnostic.rules.RepositoryEntityMismatchRule;
 import com.springbrain.core.export.JsonExporter;
 import com.springbrain.core.graph.GraphBuilder;
 import com.springbrain.core.graph.GraphDocument;
@@ -59,13 +55,7 @@ public class ServeCommand implements Callable<Integer> {
     )
     private boolean noOpen;
 
-    @SuppressWarnings("rawtypes")
-    private static final List RULES = List.of(
-            new ControllerWithoutServiceRule(),
-            new ControllerDirectRepositoryRule(),
-            new MissingRepositoryBeanRule(),
-            new RepositoryEntityMismatchRule(),
-            new MissingConfigPropertyRule());
+    private static final List<DiagnosticRule> RULES = DiagnosticEngine.defaultRules();
 
     @Override
     public Integer call() {

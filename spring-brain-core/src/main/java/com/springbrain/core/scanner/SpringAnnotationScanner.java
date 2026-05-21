@@ -14,6 +14,7 @@ import com.github.javaparser.ast.expr.NormalAnnotationExpr;
 import com.github.javaparser.ast.expr.SingleMemberAnnotationExpr;
 import com.github.javaparser.ast.expr.StringLiteralExpr;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import com.springbrain.core.model.BeanModel;
 import com.springbrain.core.model.ConfigPropertyUsageModel;
 import com.springbrain.core.model.ControllerModel;
 import com.springbrain.core.model.EntityModel;
@@ -37,6 +38,9 @@ public final class SpringAnnotationScanner {
 
     private static final Set<String> SERVICE_ANNOTATIONS =
             Set.of("Service");
+
+    private static final Set<String> EXTRA_BEAN_ANNOTATIONS =
+            Set.of("Component", "Configuration", "ControllerAdvice");
 
     private static final Set<String> REPOSITORY_BASE_TYPES =
             Set.of("JpaRepository", "CrudRepository", "PagingAndSortingRepository",
@@ -64,6 +68,7 @@ public final class SpringAnnotationScanner {
         List<RepositoryModel> repositories = new ArrayList<>();
         List<EntityModel> entities = new ArrayList<>();
         List<ConfigPropertyUsageModel> configPropertyUsages = new ArrayList<>();
+        List<BeanModel> beans = new ArrayList<>();
 
         for (Path absolutePath : javaFiles) {
             Path relativePath = projectRoot.relativize(absolutePath);
@@ -75,7 +80,7 @@ public final class SpringAnnotationScanner {
 
                 for (ClassOrInterfaceDeclaration type : cu.findAll(ClassOrInterfaceDeclaration.class)) {
                     processType(type, packageName, relativePath,
-                            controllers, services, repositories, entities, configPropertyUsages);
+                            controllers, services, repositories, entities, configPropertyUsages, beans);
                 }
             } catch (IOException e) {
                 throw new UncheckedIOException("Failed to parse: " + absolutePath, e);
@@ -88,6 +93,7 @@ public final class SpringAnnotationScanner {
                 .repositories(repositories)
                 .entities(entities)
                 .configPropertyUsages(configPropertyUsages)
+                .beans(beans)
                 .definedConfigKeys(PropertiesScanner.scan(projectRoot))
                 .build();
     }
@@ -99,7 +105,8 @@ public final class SpringAnnotationScanner {
                                     List<ServiceModel> services,
                                     List<RepositoryModel> repositories,
                                     List<EntityModel> entities,
-                                    List<ConfigPropertyUsageModel> configPropertyUsages) {
+                                    List<ConfigPropertyUsageModel> configPropertyUsages,
+                                    List<BeanModel> beans) {
 
         String className = type.getNameAsString();
         String qualifiedName = packageName.isEmpty() ? className : packageName + "." + className;
@@ -118,6 +125,7 @@ public final class SpringAnnotationScanner {
             List<String> injected = extractInjectedTypeNames(type);
             controllers.add(new ControllerModel(
                     className, packageName, qualifiedName, relativePath, line, routes, injected));
+            beans.add(new BeanModel(className, qualifiedName, "controller", relativePath, line, injected));
             return;
         }
 
@@ -127,6 +135,7 @@ public final class SpringAnnotationScanner {
                     .map(ClassOrInterfaceType::getNameAsString)
                     .toList();
             services.add(new ServiceModel(className, qualifiedName, relativePath, line, injected, interfaces));
+            beans.add(new BeanModel(className, qualifiedName, "service", relativePath, line, injected));
             return;
         }
 
@@ -138,7 +147,16 @@ public final class SpringAnnotationScanner {
         // Repositories: interface extending JpaRepository / CrudRepository
         if (type.isInterface()) {
             tryExtractRepository(type, className, qualifiedName, relativePath, line)
-                    .ifPresent(repositories::add);
+                    .ifPresent(repo -> {
+                        repositories.add(repo);
+                        beans.add(new BeanModel(className, qualifiedName, "repository", relativePath, line, List.of()));
+                    });
+            return;
+        }
+
+        String beanType = extraBeanType(annotations);
+        if (beanType != null) {
+            beans.add(new BeanModel(className, qualifiedName, beanType, relativePath, line, extractInjectedTypeNames(type)));
         }
     }
 
@@ -148,6 +166,21 @@ public final class SpringAnnotationScanner {
 
     private static boolean hasAnnotationNamed(List<AnnotationExpr> annotations, String name) {
         return annotations.stream().anyMatch(a -> a.getNameAsString().equals(name));
+    }
+
+    private static String extraBeanType(List<AnnotationExpr> annotations) {
+        for (AnnotationExpr annotation : annotations) {
+            String name = annotation.getNameAsString();
+            if (EXTRA_BEAN_ANNOTATIONS.contains(name)) {
+                return switch (name) {
+                    case "Component" -> "component";
+                    case "Configuration" -> "configuration";
+                    case "ControllerAdvice" -> "controller_advice";
+                    default -> null;
+                };
+            }
+        }
+        return null;
     }
 
     /**

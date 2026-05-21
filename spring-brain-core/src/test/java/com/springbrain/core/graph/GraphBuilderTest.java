@@ -151,6 +151,22 @@ class GraphBuilderTest {
         assertThat(count).isEqualTo(1);
     }
 
+    // ── Bean nodes ───────────────────────────────────────────────────────────────
+
+    @Test
+    void buildsBeanNodesForSpringBeans() throws Exception {
+        ProjectModel model = scanFixtures("BeanDependencyService.java", "BillingComponent.java");
+        GraphDocument graph = GraphBuilder.build(model, "test-project", Instant.parse("2026-01-01T00:00:00Z"));
+
+        List<String> beanIds = graph.nodes().stream()
+                .filter(n -> n.type().equals("bean"))
+                .map(GraphNode::id)
+                .toList();
+        assertThat(beanIds).containsExactlyInAnyOrder(
+                "bean:com.example.billing.BeanDependencyService",
+                "bean:com.example.billing.BillingComponent");
+    }
+
     // ── maps_to edges ─────────────────────────────────────────────────────────
 
     @Test
@@ -177,6 +193,19 @@ class GraphBuilderTest {
                 e.type().equals("manages")
                 && e.from().equals("repository:com.example.user.UserRepository")
                 && e.to().equals("entity:com.example.user.User"));
+    }
+
+    // ── injects edges (bean dependency graph) ───────────────────────────────────
+
+    @Test
+    void buildsInjectsEdgeBetweenBeans() throws Exception {
+        ProjectModel model = scanFixtures("BeanDependencyService.java", "BillingComponent.java");
+        GraphDocument graph = GraphBuilder.build(model, "test-project", Instant.parse("2026-01-01T00:00:00Z"));
+
+        assertThat(graph.edges()).anyMatch(e ->
+                e.type().equals("injects")
+                && e.from().equals("bean:com.example.billing.BeanDependencyService")
+                && e.to().equals("bean:com.example.billing.BillingComponent"));
     }
 
     // ── calls edges via interface injection (controller → service impl) ──────

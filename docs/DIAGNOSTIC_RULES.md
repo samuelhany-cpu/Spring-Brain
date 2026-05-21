@@ -121,7 +121,23 @@ A property is used via `@Value("${key}")` but not found in any scanned configura
 
 ---
 
-## 6. Rule Engine Interface
+## 6. Phase 3 Rules
+
+### Rule 6 - Circular Dependency
+
+**Code:** `SPRING_BRAIN_CIRCULAR_DEPENDENCY`
+**Severity:** ERROR
+
+Two or more Spring beans depend on each other through constructor or autowired field injection. Circular dependencies can prevent startup or make bean initialization order fragile.
+
+**Suggested fixes:**
+- Introduce an interface or mediator to break the direct bean cycle
+- Move shared behavior into a third bean that both cyclic beans can depend on
+- Replace one dependency with an event or callback if it is not required during construction
+
+---
+
+## 7. Rule Engine Interface
 
 ```java
 public interface DiagnosticRule {
@@ -130,7 +146,7 @@ public interface DiagnosticRule {
 }
 ```
 
-## 7. Diagnostic Ordering
+## 8. Diagnostic Ordering
 
 Sort by:
 1. Severity: ERROR → WARNING → INFO
@@ -139,7 +155,7 @@ Sort by:
 4. Code
 5. Message
 
-## 8. Testing Requirements
+## 9. Testing Requirements
 
 Each rule must have:
 - Positive test (rule fires)

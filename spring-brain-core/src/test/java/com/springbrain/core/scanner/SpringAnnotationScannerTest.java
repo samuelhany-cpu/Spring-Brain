@@ -1,6 +1,7 @@
 package com.springbrain.core.scanner;
 
 import com.springbrain.core.model.ConfigPropertyUsageModel;
+import com.springbrain.core.model.BeanModel;
 import com.springbrain.core.model.ControllerModel;
 import com.springbrain.core.model.EntityModel;
 import com.springbrain.core.model.ProjectModel;
@@ -306,5 +307,46 @@ class SpringAnnotationScannerTest {
 
         assertThat(model.getServices()).hasSize(1);
         assertThat(model.getServices().get(0).getClassName()).isEqualTo("ServiceWithTextBlock");
+    }
+
+    // ── Generic Spring bean detection ─────────────────────────────────────────────
+
+    @Test
+    void detectsGenericSpringBeans() throws Exception {
+        ProjectModel model = scanFixture(
+                "BillingComponent.java",
+                "SecurityConfiguration.java",
+                "ApiExceptionHandler.java",
+                "UserRepository.java");
+
+        assertThat(model.getBeans())
+                .extracting(BeanModel::getClassName, BeanModel::getBeanType)
+                .containsExactlyInAnyOrder(
+                        org.assertj.core.groups.Tuple.tuple("BillingComponent", "component"),
+                        org.assertj.core.groups.Tuple.tuple("SecurityConfiguration", "configuration"),
+                        org.assertj.core.groups.Tuple.tuple("ApiExceptionHandler", "controller_advice"),
+                        org.assertj.core.groups.Tuple.tuple("UserRepository", "repository"));
+    }
+
+    @Test
+    void beanModelContainsLocationAndQualifiedName() throws Exception {
+        ProjectModel model = scanFixture("BillingComponent.java");
+
+        BeanModel bean = model.getBeans().get(0);
+        assertThat(bean.getQualifiedName()).isEqualTo("com.example.billing.BillingComponent");
+        assertThat(bean.getFile().isAbsolute()).isFalse();
+        assertThat(bean.getLine()).isGreaterThan(0);
+    }
+
+    @Test
+    void beanModelContainsInjectedTypeNames() throws Exception {
+        ProjectModel model = scanFixture("BeanDependencyService.java", "BillingComponent.java");
+
+        BeanModel bean = model.getBeans().stream()
+                .filter(b -> b.getClassName().equals("BeanDependencyService"))
+                .findFirst()
+                .orElseThrow();
+        assertThat(bean.getBeanType()).isEqualTo("service");
+        assertThat(bean.getInjectedTypeNames()).containsExactly("BillingComponent");
     }
 }

@@ -1,6 +1,7 @@
 package com.springbrain.core.graph;
 
 import com.springbrain.core.SpringBrainVersion;
+import com.springbrain.core.model.BeanModel;
 import com.springbrain.core.model.ConfigPropertyUsageModel;
 import com.springbrain.core.model.ControllerModel;
 import com.springbrain.core.model.EntityModel;
@@ -45,6 +46,13 @@ public final class GraphBuilder {
         Map<String, EntityModel> entitiesByClassName = new HashMap<>();
         for (EntityModel e : model.getEntities()) {
             entitiesByClassName.put(e.getClassName(), e);
+        }
+
+        Map<String, BeanModel> beansByClassName = new HashMap<>();
+        Map<String, BeanModel> beansByQualifiedName = new HashMap<>();
+        for (BeanModel bean : model.getBeans()) {
+            beansByClassName.put(bean.getClassName(), bean);
+            beansByQualifiedName.put(bean.getQualifiedName(), bean);
         }
 
         // Tracks which component qualified names map to node IDs (for uses_config edges)
@@ -162,6 +170,30 @@ public final class GraphBuilder {
             }
         }
 
+        // 6. Generic Spring bean dependency graph
+        for (BeanModel bean : model.getBeans()) {
+            String beanId = beanId(bean);
+            putNode(nodes, new GraphNode(
+                    beanId,
+                    "bean",
+                    bean.getClassName(),
+                    bean.getQualifiedName(),
+                    bean.getFile().toString().replace('\\', '/'),
+                    bean.getLine()));
+
+            for (String injectedType : bean.getInjectedTypeNames()) {
+                BeanModel target = resolveBean(injectedType, beansByClassName, beansByQualifiedName, servicesByClassName);
+                if (target != null) {
+                    String targetId = beanId(target);
+                    putEdge(edges, new GraphEdge(
+                            "edge:injects:" + beanId + "->" + targetId,
+                            beanId,
+                            targetId,
+                            "injects"));
+                }
+            }
+        }
+
         List<GraphNode> sortedNodes = nodes.values().stream()
                 .sorted(Comparator.comparing(GraphNode::type).thenComparing(GraphNode::id))
                 .toList();
@@ -190,5 +222,24 @@ public final class GraphBuilder {
 
     private static void putEdge(Map<String, GraphEdge> edges, GraphEdge edge) {
         edges.putIfAbsent(edge.id(), edge);
+    }
+
+    private static String beanId(BeanModel bean) {
+        return "bean:" + bean.getQualifiedName();
+    }
+
+    private static BeanModel resolveBean(String injectedType,
+                                         Map<String, BeanModel> beansByClassName,
+                                         Map<String, BeanModel> beansByQualifiedName,
+                                         Map<String, ServiceModel> servicesByClassName) {
+        BeanModel direct = beansByClassName.get(injectedType);
+        if (direct != null) {
+            return direct;
+        }
+        ServiceModel service = servicesByClassName.get(injectedType);
+        if (service != null) {
+            return beansByQualifiedName.get(service.getQualifiedName());
+        }
+        return null;
     }
 }

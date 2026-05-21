@@ -1,5 +1,11 @@
 package com.springbrain.core.diagnostic;
 
+import com.springbrain.core.diagnostic.rules.CircularDependencyRule;
+import com.springbrain.core.diagnostic.rules.ControllerDirectRepositoryRule;
+import com.springbrain.core.diagnostic.rules.ControllerWithoutServiceRule;
+import com.springbrain.core.diagnostic.rules.MissingConfigPropertyRule;
+import com.springbrain.core.diagnostic.rules.MissingRepositoryBeanRule;
+import com.springbrain.core.diagnostic.rules.RepositoryEntityMismatchRule;
 import com.springbrain.core.graph.GraphDocument;
 import com.springbrain.core.model.ProjectModel;
 
@@ -10,6 +16,16 @@ import java.util.List;
 public final class DiagnosticEngine {
 
     private DiagnosticEngine() {}
+
+    public static List<DiagnosticRule> defaultRules() {
+        return List.of(
+                new ControllerWithoutServiceRule(),
+                new ControllerDirectRepositoryRule(),
+                new MissingRepositoryBeanRule(),
+                new RepositoryEntityMismatchRule(),
+                new MissingConfigPropertyRule(),
+                new CircularDependencyRule());
+    }
 
     public static DiagnosticsReport analyze(ProjectModel model, GraphDocument graph, List<DiagnosticRule> rules) {
         List<Diagnostic> all = new ArrayList<>();

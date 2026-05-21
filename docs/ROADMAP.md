@@ -26,8 +26,8 @@ React + TypeScript + Vite + React Flow graph viewer with:
 
 ## Phase 3 — Advanced Spring Analysis
 
-- Bean dependency graph
-- Circular dependency detection
+- Bean dependency graph - started
+- Circular dependency detection - started
 - Scheduled task mapping
 - Event publisher/listener mapping
 - Async method detection
