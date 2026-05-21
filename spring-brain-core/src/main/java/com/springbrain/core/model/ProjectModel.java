@@ -2,10 +2,8 @@ package com.springbrain.core.model;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 
-/**
- * Root model built by the scanner. Populated in Milestone 1.
- */
 public final class ProjectModel {
 
     private final Path rootPath;
@@ -14,6 +12,7 @@ public final class ProjectModel {
     private final List<RepositoryModel> repositories;
     private final List<EntityModel> entities;
     private final List<ConfigPropertyUsageModel> configPropertyUsages;
+    private final Set<String> definedConfigKeys;
 
     private ProjectModel(Builder builder) {
         this.rootPath = builder.rootPath;
@@ -22,31 +21,16 @@ public final class ProjectModel {
         this.repositories = List.copyOf(builder.repositories);
         this.entities = List.copyOf(builder.entities);
         this.configPropertyUsages = List.copyOf(builder.configPropertyUsages);
+        this.definedConfigKeys = Set.copyOf(builder.definedConfigKeys);
     }
 
-    public Path getRootPath() {
-        return rootPath;
-    }
-
-    public List<ControllerModel> getControllers() {
-        return controllers;
-    }
-
-    public List<ServiceModel> getServices() {
-        return services;
-    }
-
-    public List<RepositoryModel> getRepositories() {
-        return repositories;
-    }
-
-    public List<EntityModel> getEntities() {
-        return entities;
-    }
-
-    public List<ConfigPropertyUsageModel> getConfigPropertyUsages() {
-        return configPropertyUsages;
-    }
+    public Path getRootPath() { return rootPath; }
+    public List<ControllerModel> getControllers() { return controllers; }
+    public List<ServiceModel> getServices() { return services; }
+    public List<RepositoryModel> getRepositories() { return repositories; }
+    public List<EntityModel> getEntities() { return entities; }
+    public List<ConfigPropertyUsageModel> getConfigPropertyUsages() { return configPropertyUsages; }
+    public Set<String> getDefinedConfigKeys() { return definedConfigKeys; }
 
     public static Builder builder(Path rootPath) {
         return new Builder(rootPath);
@@ -59,34 +43,29 @@ public final class ProjectModel {
         private List<RepositoryModel> repositories = List.of();
         private List<EntityModel> entities = List.of();
         private List<ConfigPropertyUsageModel> configPropertyUsages = List.of();
+        private Set<String> definedConfigKeys = Set.of();
 
         private Builder(Path rootPath) {
             this.rootPath = rootPath;
         }
 
         public Builder controllers(List<ControllerModel> controllers) {
-            this.controllers = controllers;
-            return this;
+            this.controllers = controllers; return this;
         }
-
         public Builder services(List<ServiceModel> services) {
-            this.services = services;
-            return this;
+            this.services = services; return this;
         }
-
         public Builder repositories(List<RepositoryModel> repositories) {
-            this.repositories = repositories;
-            return this;
+            this.repositories = repositories; return this;
         }
-
         public Builder entities(List<EntityModel> entities) {
-            this.entities = entities;
-            return this;
+            this.entities = entities; return this;
         }
-
         public Builder configPropertyUsages(List<ConfigPropertyUsageModel> configPropertyUsages) {
-            this.configPropertyUsages = configPropertyUsages;
-            return this;
+            this.configPropertyUsages = configPropertyUsages; return this;
+        }
+        public Builder definedConfigKeys(Set<String> definedConfigKeys) {
+            this.definedConfigKeys = definedConfigKeys; return this;
         }
 
         public ProjectModel build() {

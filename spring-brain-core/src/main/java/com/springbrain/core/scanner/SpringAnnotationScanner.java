@@ -84,6 +84,7 @@ public final class SpringAnnotationScanner {
                 .repositories(repositories)
                 .entities(entities)
                 .configPropertyUsages(configPropertyUsages)
+                .definedConfigKeys(PropertiesScanner.scan(projectRoot))
                 .build();
     }
 
