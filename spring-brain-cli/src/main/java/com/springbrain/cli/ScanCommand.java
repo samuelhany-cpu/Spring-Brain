@@ -53,6 +53,27 @@ public class ScanCommand implements Callable<Integer> {
     )
     private boolean failOnError;
 
+    @Option(
+            names = {"--serve"},
+            description = "Start the interactive viewer after scanning.",
+            defaultValue = "false"
+    )
+    private boolean serve;
+
+    @Option(
+            names = {"--port"},
+            description = "HTTP port for the viewer server when --serve is used. Defaults to 3000.",
+            defaultValue = "3000"
+    )
+    private int port;
+
+    @Option(
+            names = {"--no-open"},
+            description = "Do not open the browser automatically when --serve is used.",
+            defaultValue = "false"
+    )
+    private boolean noOpen;
+
     private static final List RULES = List.of(
             new ControllerWithoutServiceRule(),
             new ControllerDirectRepositoryRule(),
@@ -127,11 +148,44 @@ public class ScanCommand implements Callable<Integer> {
                 return 2;
             }
 
+            if (serve) {
+                if (noOpen) {
+                    return 0;
+                }
+                try {
+                    ViewerServer server = new ViewerServer();
+                    server.start(port, resolvedOutput);
+                    int actualPort = server.getPort();
+                    String url = "http://localhost:" + actualPort;
+                    System.out.println("Spring Brain viewer running at: " + url);
+                    openBrowser(url);
+                    System.out.println("Press Ctrl+C to stop.");
+                    Runtime.getRuntime().addShutdownHook(new Thread(server::stop, "spring-brain-shutdown"));
+                    Thread.currentThread().join();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+
             return 0;
 
         } catch (IOException e) {
             System.err.println("Error writing output: " + e.getMessage());
             return 1;
+        }
+    }
+
+    private void openBrowser(String url) {
+        try {
+            String os = System.getProperty("os.name", "").toLowerCase();
+            if (os.contains("win")) {
+                Runtime.getRuntime().exec(new String[]{"rundll32", "url.dll,FileProtocolHandler", url});
+            } else if (os.contains("mac")) {
+                Runtime.getRuntime().exec(new String[]{"open", url});
+            } else {
+                Runtime.getRuntime().exec(new String[]{"xdg-open", url});
+            }
+        } catch (IOException ignored) {
         }
     }
 }

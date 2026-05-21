@@ -96,4 +96,18 @@ class ScanCommandTest {
         int exitCode = cmd.execute("scan", "--path", tempDir.toString(), "--fail-on-error");
         assertThat(exitCode).isZero();
     }
+
+    @Test
+    void scanServeNoOpenExitsZero() {
+        CommandLine cmd = new CommandLine(new SpringBrainCli());
+        int exitCode = cmd.execute("scan", "--path", tempDir.toString(), "--serve", "--no-open");
+        assertThat(exitCode).isZero();
+    }
+
+    @Test
+    void scanServeWithCustomPortExitsZero() {
+        CommandLine cmd = new CommandLine(new SpringBrainCli());
+        int exitCode = cmd.execute("scan", "--path", tempDir.toString(), "--serve", "--port", "19877", "--no-open");
+        assertThat(exitCode).isZero();
+    }
 }
