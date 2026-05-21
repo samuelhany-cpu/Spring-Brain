@@ -7,6 +7,8 @@ import com.springbrain.core.model.EntityModel;
 import com.springbrain.core.model.ProjectModel;
 import com.springbrain.core.model.RepositoryModel;
 import com.springbrain.core.model.RouteModel;
+import com.springbrain.core.model.SecurityAnnotationModel;
+import com.springbrain.core.model.SecurityRuleModel;
 import com.springbrain.core.model.ServiceModel;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -348,5 +350,75 @@ class SpringAnnotationScannerTest {
                 .orElseThrow();
         assertThat(bean.getBeanType()).isEqualTo("service");
         assertThat(bean.getInjectedTypeNames()).containsExactly("BillingComponent");
+    }
+
+    // Security annotation detection
+
+    @Test
+    void detectsSpringSecurityAnnotations() throws Exception {
+        ProjectModel model = scanFixture("SecuredController.java");
+
+        assertThat(model.getSecurityAnnotations())
+                .extracting(SecurityAnnotationModel::getAnnotationName,
+                        SecurityAnnotationModel::getExpression,
+                        SecurityAnnotationModel::getOwnerQualifiedName,
+                        SecurityAnnotationModel::getMethodName)
+                .contains(
+                        org.assertj.core.groups.Tuple.tuple(
+                                "PreAuthorize",
+                                "hasRole('ADMIN')",
+                                "com.example.security.SecuredController",
+                                ""),
+                        org.assertj.core.groups.Tuple.tuple(
+                                "PreAuthorize",
+                                "hasAnyRole('ADMIN','EMPLOYEE')",
+                                "com.example.security.SecuredController",
+                                "staffOnly"),
+                        org.assertj.core.groups.Tuple.tuple(
+                                "Secured",
+                                "ROLE_ADMIN",
+                                "com.example.security.SecuredController",
+                                "legacyAdmin"),
+                        org.assertj.core.groups.Tuple.tuple(
+                                "RolesAllowed",
+                                "ADMIN",
+                                "com.example.security.SecuredController",
+                                "jakartaAdmin"));
+    }
+
+    @Test
+    void securityAnnotationsContainFileAndLine() throws Exception {
+        ProjectModel model = scanFixture("SecuredController.java");
+
+        assertThat(model.getSecurityAnnotations()).allMatch(annotation ->
+                annotation.getFile() != null
+                        && !annotation.getFile().isAbsolute()
+                        && annotation.getLine() > 0);
+    }
+
+    @Test
+    void detectsSecurityFilterChainRules() throws Exception {
+        ProjectModel model = scanFixture("SecurityFilterChainConfig.java");
+
+        assertThat(model.getSecurityRules())
+                .extracting(SecurityRuleModel::getPathPattern,
+                        SecurityRuleModel::getAccessType,
+                        SecurityRuleModel::getDetail)
+                .contains(
+                        org.assertj.core.groups.Tuple.tuple("/", "PUBLIC", "permitAll"),
+                        org.assertj.core.groups.Tuple.tuple("/login", "PUBLIC", "permitAll"),
+                        org.assertj.core.groups.Tuple.tuple("/admin/**", "PROTECTED", "authenticated"),
+                        org.assertj.core.groups.Tuple.tuple("/client/**", "PROTECTED", "hasRole(\"CLIENT\")"));
+    }
+
+    @Test
+    void securityRulesContainFileAndLine() throws Exception {
+        ProjectModel model = scanFixture("SecurityFilterChainConfig.java");
+
+        assertThat(model.getSecurityRules()).allMatch(rule ->
+                rule.getFile() != null
+                        && !rule.getFile().isAbsolute()
+                        && rule.getLine() > 0
+                        && rule.getSource().equals("SecurityFilterChain"));
     }
 }

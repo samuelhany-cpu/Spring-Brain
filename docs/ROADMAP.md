@@ -37,10 +37,10 @@ React + TypeScript + Vite + React Flow graph viewer with:
 
 ## Phase 4 — Security Intelligence
 
-- Detect `@PreAuthorize`, `@Secured`, `@RolesAllowed`
-- Parse `SecurityFilterChain`
-- Generate endpoint security matrix
-- Flag risky public endpoints
+- [x] Detect `@PreAuthorize`, `@Secured`, `@RolesAllowed`
+- [x] Parse simple chained `SecurityFilterChain` `requestMatchers(...)` rules
+- [x] Generate endpoint security matrix
+- [x] Flag risky public mutating endpoints
 
 ---
 

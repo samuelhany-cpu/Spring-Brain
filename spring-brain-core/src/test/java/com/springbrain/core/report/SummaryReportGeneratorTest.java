@@ -157,6 +157,19 @@ class SummaryReportGeneratorTest {
     }
 
     @Test
+    void reportContainsEndpointSecurityMatrix() throws Exception {
+        ProjectModel model = scan("SecuredController.java", "SecurityFilterChainConfig.java");
+        GraphDocument g = graph(model);
+        String report = SummaryReportGenerator.generate(model, g, diagnostics(model, g));
+
+        assertThat(report).contains("## Endpoint Security Matrix");
+        assertThat(report).contains("| Method | Path | Access | Source | Detail |");
+        assertThat(report).contains("PROTECTED");
+        assertThat(report).contains("method_annotation");
+        assertThat(report).contains("PreAuthorize");
+    }
+
+    @Test
     void emptyProjectShowsNoEndpoints() throws Exception {
         ProjectModel model = SpringAnnotationScanner.scan(tempDir);
         GraphDocument g = graph(model);

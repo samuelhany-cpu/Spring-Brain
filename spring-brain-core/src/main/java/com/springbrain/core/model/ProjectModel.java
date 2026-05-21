@@ -13,6 +13,8 @@ public final class ProjectModel {
     private final List<EntityModel> entities;
     private final List<ConfigPropertyUsageModel> configPropertyUsages;
     private final List<BeanModel> beans;
+    private final List<SecurityAnnotationModel> securityAnnotations;
+    private final List<SecurityRuleModel> securityRules;
     private final Set<String> definedConfigKeys;
 
     private ProjectModel(Builder builder) {
@@ -23,6 +25,8 @@ public final class ProjectModel {
         this.entities = List.copyOf(builder.entities);
         this.configPropertyUsages = List.copyOf(builder.configPropertyUsages);
         this.beans = List.copyOf(builder.beans);
+        this.securityAnnotations = List.copyOf(builder.securityAnnotations);
+        this.securityRules = List.copyOf(builder.securityRules);
         this.definedConfigKeys = Set.copyOf(builder.definedConfigKeys);
     }
 
@@ -33,6 +37,8 @@ public final class ProjectModel {
     public List<EntityModel> getEntities() { return entities; }
     public List<ConfigPropertyUsageModel> getConfigPropertyUsages() { return configPropertyUsages; }
     public List<BeanModel> getBeans() { return beans; }
+    public List<SecurityAnnotationModel> getSecurityAnnotations() { return securityAnnotations; }
+    public List<SecurityRuleModel> getSecurityRules() { return securityRules; }
     public Set<String> getDefinedConfigKeys() { return definedConfigKeys; }
 
     public static Builder builder(Path rootPath) {
@@ -47,6 +53,8 @@ public final class ProjectModel {
         private List<EntityModel> entities = List.of();
         private List<ConfigPropertyUsageModel> configPropertyUsages = List.of();
         private List<BeanModel> beans = List.of();
+        private List<SecurityAnnotationModel> securityAnnotations = List.of();
+        private List<SecurityRuleModel> securityRules = List.of();
         private Set<String> definedConfigKeys = Set.of();
 
         private Builder(Path rootPath) {
@@ -70,6 +78,12 @@ public final class ProjectModel {
         }
         public Builder beans(List<BeanModel> beans) {
             this.beans = beans; return this;
+        }
+        public Builder securityAnnotations(List<SecurityAnnotationModel> securityAnnotations) {
+            this.securityAnnotations = securityAnnotations; return this;
+        }
+        public Builder securityRules(List<SecurityRuleModel> securityRules) {
+            this.securityRules = securityRules; return this;
         }
         public Builder definedConfigKeys(Set<String> definedConfigKeys) {
             this.definedConfigKeys = definedConfigKeys; return this;

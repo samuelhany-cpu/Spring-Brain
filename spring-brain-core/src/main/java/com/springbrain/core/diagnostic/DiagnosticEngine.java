@@ -5,6 +5,7 @@ import com.springbrain.core.diagnostic.rules.ControllerDirectRepositoryRule;
 import com.springbrain.core.diagnostic.rules.ControllerWithoutServiceRule;
 import com.springbrain.core.diagnostic.rules.MissingConfigPropertyRule;
 import com.springbrain.core.diagnostic.rules.MissingRepositoryBeanRule;
+import com.springbrain.core.diagnostic.rules.PublicRiskyEndpointRule;
 import com.springbrain.core.diagnostic.rules.RepositoryEntityMismatchRule;
 import com.springbrain.core.graph.GraphDocument;
 import com.springbrain.core.model.ProjectModel;
@@ -24,7 +25,8 @@ public final class DiagnosticEngine {
                 new MissingRepositoryBeanRule(),
                 new RepositoryEntityMismatchRule(),
                 new MissingConfigPropertyRule(),
-                new CircularDependencyRule());
+                new CircularDependencyRule(),
+                new PublicRiskyEndpointRule());
     }
 
     public static DiagnosticsReport analyze(ProjectModel model, GraphDocument graph, List<DiagnosticRule> rules) {

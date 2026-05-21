@@ -137,7 +137,23 @@ Two or more Spring beans depend on each other through constructor or autowired f
 
 ---
 
-## 7. Rule Engine Interface
+## 7. Phase 4 Rules
+
+### Rule 7 - Public Risky Endpoint
+
+**Code:** `SPRING_BRAIN_PUBLIC_RISKY_ENDPOINT`
+**Severity:** WARNING
+
+A mutating endpoint (`POST`, `PUT`, `PATCH`, or `DELETE`) is matched by a public `SecurityFilterChain` rule such as `permitAll`.
+
+**Suggested fixes:**
+- Require authentication or role checks for the endpoint
+- Move the endpoint out of `permitAll` request matchers if it changes state
+- Add a method-level security annotation such as `@PreAuthorize`
+
+---
+
+## 8. Rule Engine Interface
 
 ```java
 public interface DiagnosticRule {
@@ -146,7 +162,7 @@ public interface DiagnosticRule {
 }
 ```
 
-## 8. Diagnostic Ordering
+## 9. Diagnostic Ordering
 
 Sort by:
 1. Severity: ERROR → WARNING → INFO
@@ -155,7 +171,7 @@ Sort by:
 4. Code
 5. Message
 
-## 9. Testing Requirements
+## 10. Testing Requirements
 
 Each rule must have:
 - Positive test (rule fires)

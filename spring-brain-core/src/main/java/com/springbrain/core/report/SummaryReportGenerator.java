@@ -6,6 +6,8 @@ import com.springbrain.core.diagnostic.DiagnosticsReport;
 import com.springbrain.core.graph.GraphDocument;
 import com.springbrain.core.model.ProjectModel;
 import com.springbrain.core.model.RouteModel;
+import com.springbrain.core.security.EndpointSecurityModel;
+import com.springbrain.core.security.EndpointSecurityResolver;
 
 import java.util.List;
 import java.util.Map;
@@ -22,6 +24,7 @@ public final class SummaryReportGenerator {
         appendOverview(sb, graph);
         appendComponents(sb, model);
         appendEndpoints(sb, model);
+        appendEndpointSecurityMatrix(sb, model);
         appendGraphSummary(sb, graph);
         appendDiagnostics(sb, diagnostics);
         appendSuggestedActions(sb, diagnostics);
@@ -82,6 +85,28 @@ public final class SummaryReportGenerator {
                     .append(" | ").append(r.getPath())
                     .append(" | ").append(simpleClassName(r.getControllerClass()))
                     .append(" | ").append(r.getMethodName())
+                    .append(" |\n");
+        }
+        sb.append("\n");
+    }
+
+    private static void appendEndpointSecurityMatrix(StringBuilder sb, ProjectModel model) {
+        sb.append("## Endpoint Security Matrix\n\n");
+
+        List<EndpointSecurityModel> endpoints = EndpointSecurityResolver.resolve(model);
+        if (endpoints.isEmpty()) {
+            sb.append("_No endpoints found._\n\n");
+            return;
+        }
+
+        sb.append("| Method | Path | Access | Source | Detail |\n");
+        sb.append("|--------|------|--------|--------|--------|\n");
+        for (EndpointSecurityModel endpoint : endpoints) {
+            sb.append("| ").append(endpoint.getHttpMethod())
+                    .append(" | ").append(endpoint.getPath())
+                    .append(" | ").append(endpoint.getAccess())
+                    .append(" | ").append(endpoint.getSource())
+                    .append(" | ").append(escapePipe(endpoint.getDetail()))
                     .append(" |\n");
         }
         sb.append("\n");

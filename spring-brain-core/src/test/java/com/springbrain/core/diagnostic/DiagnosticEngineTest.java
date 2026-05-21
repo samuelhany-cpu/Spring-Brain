@@ -5,6 +5,7 @@ import com.springbrain.core.diagnostic.rules.ControllerWithoutServiceRule;
 import com.springbrain.core.diagnostic.rules.CircularDependencyRule;
 import com.springbrain.core.diagnostic.rules.MissingConfigPropertyRule;
 import com.springbrain.core.diagnostic.rules.MissingRepositoryBeanRule;
+import com.springbrain.core.diagnostic.rules.PublicRiskyEndpointRule;
 import com.springbrain.core.diagnostic.rules.RepositoryEntityMismatchRule;
 import com.springbrain.core.graph.GraphBuilder;
 import com.springbrain.core.graph.GraphDocument;
@@ -99,5 +100,11 @@ class DiagnosticEngineTest {
     void defaultRulesIncludeCircularDependencyRule() {
         assertThat(DiagnosticEngine.defaultRules().stream().map(DiagnosticRule::code))
                 .contains(CircularDependencyRule.CODE);
+    }
+
+    @Test
+    void defaultRulesIncludePublicRiskyEndpointRule() {
+        assertThat(DiagnosticEngine.defaultRules().stream().map(DiagnosticRule::code))
+                .contains(PublicRiskyEndpointRule.CODE);
     }
 }
