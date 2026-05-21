@@ -50,8 +50,8 @@ const mockGraph: Graph = {
     { id: 'n3', type: 'repository', label: 'UserRepository', qualifiedName: 'com.example.UserRepository', file: 'UserRepository.java', line: 3 },
   ],
   edges: [
-    { id: 'e1', source: 'n1', target: 'n2' },
-    { id: 'e2', source: 'n2', target: 'n3' },
+    { id: 'e1', from: 'n1', to: 'n2', type: 'calls' },
+    { id: 'e2', from: 'n2', to: 'n3', type: 'calls' },
   ],
 }
 

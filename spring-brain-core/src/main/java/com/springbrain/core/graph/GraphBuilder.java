@@ -27,9 +27,14 @@ public final class GraphBuilder {
         Map<String, GraphEdge> edges = new LinkedHashMap<>();
 
         // Lookup maps for matching injected type names to known components
+        // Index by class name AND any implemented interface names so controllers that
+        // inject a service interface (e.g. TourService) still match the impl (TourServiceImpl).
         Map<String, ServiceModel> servicesByClassName = new HashMap<>();
         for (ServiceModel s : model.getServices()) {
             servicesByClassName.put(s.getClassName(), s);
+            for (String iface : s.getImplementedInterfaceNames()) {
+                servicesByClassName.putIfAbsent(iface, s);
+            }
         }
 
         Map<String, RepositoryModel> reposByInterfaceName = new HashMap<>();

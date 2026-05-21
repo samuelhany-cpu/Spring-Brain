@@ -22,7 +22,7 @@ export function BaseNode({ data, selected, borderColor, textColor, hasTarget = t
         fontSize: 11,
         color: textColor,
         boxShadow: selected ? `0 0 8px ${borderColor}66` : undefined,
-        minWidth: 80,
+        whiteSpace: 'nowrap',
         textAlign: 'center',
       }}
     >

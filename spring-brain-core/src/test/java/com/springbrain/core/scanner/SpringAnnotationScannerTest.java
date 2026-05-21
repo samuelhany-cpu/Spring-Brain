@@ -280,6 +280,24 @@ class SpringAnnotationScannerTest {
                 p.getOwnerQualifiedName().equals("com.example.config.AppConfig"));
     }
 
+    // ── Service implemented interfaces ────────────────────────────────────────
+
+    @Test
+    void detectsImplementedInterfaceNamesForServiceImpl() throws Exception {
+        ProjectModel model = scanFixture("UserServiceImpl.java");
+
+        ServiceModel service = model.getServices().get(0);
+        assertThat(service.getImplementedInterfaceNames()).containsExactly("UserService");
+    }
+
+    @Test
+    void implementedInterfaceNamesEmptyWhenServiceImplementsNothing() throws Exception {
+        ProjectModel model = scanFixture("UserService.java");
+
+        ServiceModel service = model.getServices().get(0);
+        assertThat(service.getImplementedInterfaceNames()).isEmpty();
+    }
+
     // ── Java 15+ syntax (text blocks) ─────────────────────────────────────────
 
     @Test

@@ -179,6 +179,24 @@ class GraphBuilderTest {
                 && e.to().equals("entity:com.example.user.User"));
     }
 
+    // ── calls edges via interface injection (controller → service impl) ──────
+
+    @Test
+    void buildsCallsEdgeWhenControllerInjectsServiceByInterface() throws Exception {
+        // UserController injects UserService (interface); UserServiceImpl implements UserService.
+        // GraphBuilder must resolve the interface name to the impl node.
+        ProjectModel model = scanFixtures(
+                "UserController.java", "UserServiceImpl.java",
+                "UserRepository.java", "User.java");
+        GraphDocument graph = GraphBuilder.build(model, "test-project", Instant.parse("2026-01-01T00:00:00Z"));
+
+        List<GraphEdge> calls = graph.edges().stream()
+                .filter(e -> e.type().equals("calls")
+                          && e.to().equals("service:com.example.user.UserServiceImpl"))
+                .toList();
+        assertThat(calls).isNotEmpty();
+    }
+
     // ── calls edges (controller → service) ───────────────────────────────────
 
     @Test

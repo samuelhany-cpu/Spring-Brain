@@ -1,10 +1,11 @@
-import { useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 import ReactFlow, {
   Background,
   Controls,
   MiniMap,
   useNodesState,
   useEdgesState,
+  useReactFlow,
   MarkerType,
   type Node,
   type Edge,
@@ -22,16 +23,28 @@ interface Props {
   selectedNodeId: string | null
 }
 
+const NODE_HEIGHT = 40
+const CHAR_WIDTH = 7.5 // approximate px per character at 11px font
+const H_PAD = 24      // horizontal padding inside node
+
+function nodeWidth(label: string): number {
+  return Math.max(120, Math.ceil(label.length * CHAR_WIDTH) + H_PAD)
+}
+
 function applyDagreLayout(nodes: Node[], edges: Edge[]): Node[] {
   const g = new dagre.graphlib.Graph()
   g.setDefaultEdgeLabel(() => ({}))
-  g.setGraph({ rankdir: 'TB', ranksep: 60, nodesep: 40 })
-  nodes.forEach((n) => g.setNode(n.id, { width: 120, height: 36 }))
+  g.setGraph({ rankdir: 'LR', ranksep: 100, nodesep: 12 })
+  nodes.forEach((n) => {
+    const w = nodeWidth((n.data as { label: string }).label ?? n.id)
+    g.setNode(n.id, { width: w, height: NODE_HEIGHT })
+  })
   edges.forEach((e) => g.setEdge(e.source, e.target))
   dagre.layout(g)
   return nodes.map((n) => {
     const pos = g.node(n.id)
-    return { ...n, position: { x: (pos?.x ?? 0) - 60, y: (pos?.y ?? 0) - 18 } }
+    const w = nodeWidth((n.data as { label: string }).label ?? n.id)
+    return { ...n, position: { x: (pos?.x ?? 0) - w / 2, y: (pos?.y ?? 0) - NODE_HEIGHT / 2 } }
   })
 }
 
@@ -50,11 +63,11 @@ export function GraphCanvas({ graph, visibleTypes, searchQuery, onNodeClick, sel
     }))
     const visibleIds = new Set(raw.map((n) => n.id))
     const filteredEdges: Edge[] = graph.edges
-      .filter((e) => visibleIds.has(e.source) && visibleIds.has(e.target))
+      .filter((e) => visibleIds.has(e.from) && visibleIds.has(e.to))
       .map((e) => ({
         id: e.id,
-        source: e.source,
-        target: e.target,
+        source: e.from,
+        target: e.to,
         markerEnd: { type: MarkerType.ArrowClosed, color: '#30363d' },
         style: { stroke: '#30363d' },
       }))
@@ -64,18 +77,36 @@ export function GraphCanvas({ graph, visibleTypes, searchQuery, onNodeClick, sel
   const flowEdges: Edge[] = useMemo(() => {
     const visibleIds = new Set(flowNodes.map((n) => n.id))
     return graph.edges
-      .filter((e) => visibleIds.has(e.source) && visibleIds.has(e.target))
+      .filter((e) => visibleIds.has(e.from) && visibleIds.has(e.to))
       .map((e) => ({
         id: e.id,
-        source: e.source,
-        target: e.target,
+        source: e.from,
+        target: e.to,
         markerEnd: { type: MarkerType.ArrowClosed, color: '#30363d' },
         style: { stroke: '#30363d' },
       }))
   }, [graph.edges, flowNodes])
 
-  const [nodes, , onNodesChange] = useNodesState(flowNodes)
-  const [edges, , onEdgesChange] = useEdgesState(flowEdges)
+  // Changes to graph structure or visible types should re-fit the viewport.
+  // Search query only dims nodes — no re-fit needed there.
+  const layoutKey = useMemo(
+    () => graph.nodes.map((n) => n.id).sort().join(',') + '|' + [...visibleTypes].sort().join(','),
+    [graph.nodes, visibleTypes],
+  )
+
+  const { fitView } = useReactFlow()
+
+  const [nodes, setNodes, onNodesChange] = useNodesState(flowNodes)
+  const [edges, setEdges, onEdgesChange] = useEdgesState(flowEdges)
+
+  useEffect(() => { setNodes(flowNodes) }, [flowNodes, setNodes])
+  useEffect(() => { setEdges(flowEdges) }, [flowEdges, setEdges])
+
+  // Re-fit after layout settles so all nodes are visible regardless of screen size.
+  useEffect(() => {
+    const id = setTimeout(() => fitView({ padding: 0.08, duration: 350 }), 60)
+    return () => clearTimeout(id)
+  }, [layoutKey, fitView])
 
   return (
     <div style={{ flex: 1, height: '100%' }}>
@@ -85,8 +116,14 @@ export function GraphCanvas({ graph, visibleTypes, searchQuery, onNodeClick, sel
         nodeTypes={nodeTypes}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        onNodeClick={(_, node) => onNodeClick(node.id)}
+        onNodeClick={(_, node) => {
+          onNodeClick(node.id)
+          fitView({ nodes: [{ id: node.id }], duration: 400, padding: 0.6 })
+        }}
         fitView
+        fitViewOptions={{ padding: 0.08 }}
+        minZoom={0.05}
+        maxZoom={2}
         attributionPosition="bottom-left"
       >
         <Background color="#30363d" gap={20} />

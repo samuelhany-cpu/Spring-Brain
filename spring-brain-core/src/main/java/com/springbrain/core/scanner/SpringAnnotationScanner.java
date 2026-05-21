@@ -123,7 +123,10 @@ public final class SpringAnnotationScanner {
 
         if (hasAnnotation(annotations, SERVICE_ANNOTATIONS)) {
             List<String> injected = extractInjectedTypeNames(type);
-            services.add(new ServiceModel(className, qualifiedName, relativePath, line, injected));
+            List<String> interfaces = type.getImplementedTypes().stream()
+                    .map(ClassOrInterfaceType::getNameAsString)
+                    .toList();
+            services.add(new ServiceModel(className, qualifiedName, relativePath, line, injected, interfaces));
             return;
         }
 

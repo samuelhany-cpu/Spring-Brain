@@ -4,6 +4,7 @@ import { useGraphData } from './hooks/useGraphData'
 import { Toolbar } from './components/Toolbar'
 import { GraphCanvas } from './components/GraphCanvas'
 import { DetailPanel } from './components/DetailPanel'
+import { BrainBackground } from './components/BrainBackground'
 import type { NodeType } from './types'
 
 const ALL_TYPES = new Set<NodeType>(['route', 'controller', 'service', 'repository', 'entity', 'config_property'])
@@ -30,7 +31,8 @@ export default function App() {
 
   return (
     <ReactFlowProvider>
-      <div className="flex flex-col h-screen">
+      <BrainBackground />
+      <div className="flex flex-col h-screen" style={{ position: 'relative', zIndex: 1 }}>
         <Toolbar
           nodeCount={nodeCount}
           edgeCount={edgeCount}
