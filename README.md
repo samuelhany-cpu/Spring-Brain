@@ -84,6 +84,29 @@ java -jar spring-brain-cli/target/spring-brain-cli-0.1.0.jar scan \
   --output /tmp/my-report
 ```
 
+### Launch the interactive viewer
+
+```bash
+java -jar spring-brain-cli/target/spring-brain-cli-0.1.0.jar serve \
+  --path /path/to/your-spring-app
+```
+
+Scans the project, starts a local HTTP server, and opens the browser at `http://localhost:3000`. The viewer auto-refreshes when output files change.
+
+```bash
+# Custom port
+java -jar spring-brain-cli/target/spring-brain-cli-0.1.0.jar serve \
+  --path /path/to/your-spring-app \
+  --port 8080
+
+# Or launch the viewer directly from the scan command
+java -jar spring-brain-cli/target/spring-brain-cli-0.1.0.jar scan \
+  --path /path/to/your-spring-app \
+  --serve
+```
+
+Press `Ctrl+C` to stop the server.
+
 ### Fail the build on errors (CI usage)
 
 ```bash
@@ -116,7 +139,7 @@ spring-brain/
 ├── spring-brain-core/       # Domain logic, scanner, graph, diagnostics
 ├── spring-brain-cli/        # Picocli CLI entry point
 ├── spring-brain-server/     # Planned: local HTTP API
-├── spring-brain-viewer/     # Planned: React graph viewer
+├── spring-brain-viewer/     # React graph viewer (React Flow + Vite)
 ├── spring-brain-samples/
 │   ├── clean-crud-app/                          # Clean reference app (0 diagnostics)
 │   ├── broken-controller-without-service-app/   # Triggers CONTROLLER_WITHOUT_SERVICE
@@ -144,6 +167,10 @@ spring-brain/
 | `scan --path <dir>` | Scan a Spring Boot project |
 | `scan --path <dir> --output <dir>` | Custom output directory |
 | `scan --path <dir> --fail-on-error` | Exit 2 on ERROR diagnostics |
+| `scan --path <dir> --serve` | Scan + open interactive viewer |
+| `scan --path <dir> --serve --port <n>` | Viewer on custom port |
+| `serve --path <dir>` | Scan + open viewer (shorthand) |
+| `serve --path <dir> --port <n>` | Viewer on custom port |
 
 ---
 
@@ -172,6 +199,7 @@ spring-brain/
 
 ## Tech Stack
 
+**CLI / Core**
 - Java 21
 - Spring Boot 3.x (BOM only; CLI has no Spring context)
 - Maven multi-module
@@ -180,11 +208,17 @@ spring-brain/
 - Jackson 2.x
 - JUnit 5 + AssertJ
 
+**Viewer**
+- React 18 + TypeScript 5 + Vite 5
+- React Flow 11 + dagre auto-layout
+- Tailwind CSS 3
+- Vitest + Playwright E2E
+
 ---
 
 ## Status
 
-**v0.1.0 — Release Candidate** ✅
+**v0.2.0 — Interactive Viewer** ✅
 
 | Milestone | Status |
 |-----------|--------|
@@ -194,8 +228,9 @@ spring-brain/
 | 3 — Broken Link Detector | ✅ |
 | 4 — Summary Report | ✅ |
 | 5 — Release Candidate | ✅ |
+| 6 — Interactive Viewer | ✅ |
 
-124 tests pass. Produces `graph.json`, `diagnostics.json`, and `summary.md` from any Spring Boot source tree.
+136 Java tests + 9 Playwright E2E tests pass. Produces `graph.json`, `diagnostics.json`, and `summary.md` from any Spring Boot source tree, and serves them in an interactive React Flow graph viewer.
 
 ---
 
