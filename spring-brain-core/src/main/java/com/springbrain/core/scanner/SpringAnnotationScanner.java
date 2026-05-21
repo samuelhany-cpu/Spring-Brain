@@ -4,6 +4,7 @@ import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.AnnotationExpr;
@@ -101,7 +102,7 @@ public final class SpringAnnotationScanner {
 
         // Collect @Value usages from fields regardless of class type
         for (FieldDeclaration field : type.getFields()) {
-            extractValueAnnotations(field, relativePath, configPropertyUsages);
+            extractValueAnnotations(field, relativePath, qualifiedName, configPropertyUsages);
         }
 
         List<AnnotationExpr> annotations = type.getAnnotations();
@@ -109,13 +110,15 @@ public final class SpringAnnotationScanner {
         if (hasAnnotation(annotations, CONTROLLER_ANNOTATIONS)) {
             String classLevelPath = extractMappingPath(annotations);
             List<RouteModel> routes = extractRoutes(type, qualifiedName, classLevelPath, relativePath);
+            List<String> injected = extractInjectedTypeNames(type);
             controllers.add(new ControllerModel(
-                    className, packageName, qualifiedName, relativePath, line, routes));
+                    className, packageName, qualifiedName, relativePath, line, routes, injected));
             return;
         }
 
         if (hasAnnotation(annotations, SERVICE_ANNOTATIONS)) {
-            services.add(new ServiceModel(className, qualifiedName, relativePath, line));
+            List<String> injected = extractInjectedTypeNames(type);
+            services.add(new ServiceModel(className, qualifiedName, relativePath, line, injected));
             return;
         }
 
@@ -248,6 +251,7 @@ public final class SpringAnnotationScanner {
 
     private static void extractValueAnnotations(FieldDeclaration field,
                                                  Path relativePath,
+                                                 String ownerQualifiedName,
                                                  List<ConfigPropertyUsageModel> usages) {
         for (AnnotationExpr ann : field.getAnnotations()) {
             if (!ann.getNameAsString().equals("Value")) {
@@ -259,9 +263,24 @@ public final class SpringAnnotationScanner {
                     String inner = raw.substring(2, raw.indexOf("}"));
                     String key = inner.contains(":") ? inner.substring(0, inner.indexOf(":")) : inner;
                     int line = field.getBegin().map(p -> p.line).orElse(0);
-                    usages.add(new ConfigPropertyUsageModel(key, relativePath, line));
+                    usages.add(new ConfigPropertyUsageModel(key, relativePath, line, ownerQualifiedName));
                 }
             });
         }
+    }
+
+    private static List<String> extractInjectedTypeNames(ClassOrInterfaceDeclaration type) {
+        List<String> result = new ArrayList<>();
+        // Constructor injection (Spring's preferred style — no @Autowired needed)
+        for (ConstructorDeclaration constructor : type.getConstructors()) {
+            constructor.getParameters().forEach(p -> result.add(p.getTypeAsString()));
+        }
+        // Field injection via @Autowired
+        for (FieldDeclaration field : type.getFields()) {
+            if (hasAnnotationNamed(field.getAnnotations(), "Autowired")) {
+                field.getVariables().forEach(v -> result.add(v.getTypeAsString()));
+            }
+        }
+        return result;
     }
 }
