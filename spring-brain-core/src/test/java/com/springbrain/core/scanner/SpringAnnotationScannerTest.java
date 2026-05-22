@@ -301,6 +301,34 @@ class SpringAnnotationScannerTest {
         assertThat(service.getImplementedInterfaceNames()).isEmpty();
     }
 
+    // ── @Inject field injection ───────────────────────────────────────────────
+
+    @Test
+    void detectsInjectAnnotationForFieldInjection() throws Exception {
+        ProjectModel model = scanFixture("ControllerWithInjectField.java");
+
+        ControllerModel controller = model.getControllers().get(0);
+        assertThat(controller.getInjectedTypeNames()).contains("UserService");
+    }
+
+    // ── Lombok @RequiredArgsConstructor injection ─────────────────────────────
+
+    @Test
+    void detectsLombokRequiredArgsConstructorInjectedFields() throws Exception {
+        ProjectModel model = scanFixture("ServiceWithLombok.java");
+
+        ServiceModel service = model.getServices().get(0);
+        assertThat(service.getInjectedTypeNames()).containsExactlyInAnyOrder("UserRepository", "UserService");
+    }
+
+    @Test
+    void lombokStaticFinalFieldNotIncludedAsInjected() throws Exception {
+        ProjectModel model = scanFixture("ServiceWithLombok.java");
+
+        ServiceModel service = model.getServices().get(0);
+        assertThat(service.getInjectedTypeNames()).doesNotContain("String");
+    }
+
     // ── Java 15+ syntax (text blocks) ─────────────────────────────────────────
 
     @Test

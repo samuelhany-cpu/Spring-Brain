@@ -336,16 +336,40 @@ public final class SpringAnnotationScanner {
 
     private static List<String> extractInjectedTypeNames(ClassOrInterfaceDeclaration type) {
         List<String> result = new ArrayList<>();
+
         // Constructor injection (Spring's preferred style — no @Autowired needed)
         for (ConstructorDeclaration constructor : type.getConstructors()) {
             constructor.getParameters().forEach(p -> result.add(p.getTypeAsString()));
         }
-        // Field injection via @Autowired
+
+        // Lombok @RequiredArgsConstructor: treat final non-static fields as injected
+        // (Lombok generates the constructor at compile time; no explicit constructor in source)
+        if (type.getConstructors().isEmpty()
+                && hasAnnotationNamed(type.getAnnotations(), "RequiredArgsConstructor")) {
+            for (FieldDeclaration field : type.getFields()) {
+                if (field.isFinal() && !field.isStatic()) {
+                    field.getVariables().forEach(v -> result.add(v.getTypeAsString()));
+                }
+            }
+        }
+
+        // Field injection via @Autowired or @Inject (JSR-330)
         for (FieldDeclaration field : type.getFields()) {
-            if (hasAnnotationNamed(field.getAnnotations(), "Autowired")) {
+            if (hasAnnotationNamed(field.getAnnotations(), "Autowired")
+                    || hasAnnotationNamed(field.getAnnotations(), "Inject")) {
                 field.getVariables().forEach(v -> result.add(v.getTypeAsString()));
             }
         }
+
+        // Setter injection via @Autowired or @Inject on single-parameter methods
+        for (MethodDeclaration method : type.getMethods()) {
+            if ((hasAnnotationNamed(method.getAnnotations(), "Autowired")
+                    || hasAnnotationNamed(method.getAnnotations(), "Inject"))
+                    && method.getParameters().size() == 1) {
+                method.getParameters().forEach(p -> result.add(p.getTypeAsString()));
+            }
+        }
+
         return result;
     }
 

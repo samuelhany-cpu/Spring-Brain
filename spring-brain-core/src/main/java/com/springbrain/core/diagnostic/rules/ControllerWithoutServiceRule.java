@@ -6,11 +6,12 @@ import com.springbrain.core.diagnostic.DiagnosticSeverity;
 import com.springbrain.core.graph.GraphDocument;
 import com.springbrain.core.model.ControllerModel;
 import com.springbrain.core.model.ProjectModel;
+import com.springbrain.core.model.ServiceModel;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public final class ControllerWithoutServiceRule implements DiagnosticRule {
 
@@ -23,9 +24,13 @@ public final class ControllerWithoutServiceRule implements DiagnosticRule {
 
     @Override
     public List<Diagnostic> analyze(ProjectModel model, GraphDocument graph) {
-        Set<String> serviceClassNames = model.getServices().stream()
-                .map(s -> s.getClassName())
-                .collect(Collectors.toSet());
+        // Include both class names AND implemented interface names so that controllers
+        // injecting a service interface (e.g. TourService) are recognised as having a service.
+        Set<String> serviceClassNames = new HashSet<>();
+        for (ServiceModel s : model.getServices()) {
+            serviceClassNames.add(s.getClassName());
+            serviceClassNames.addAll(s.getImplementedInterfaceNames());
+        }
 
         List<Diagnostic> result = new ArrayList<>();
         for (ControllerModel ctrl : model.getControllers()) {

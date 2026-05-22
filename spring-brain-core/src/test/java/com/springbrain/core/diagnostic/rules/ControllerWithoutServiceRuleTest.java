@@ -81,6 +81,16 @@ class ControllerWithoutServiceRuleTest {
         assertThat(diags).isEmpty();
     }
 
+    @Test
+    void doesNotFireWhenControllerInjectsServiceByInterfaceName() throws Exception {
+        // ControllerInjectsInterface injects UserService (interface name),
+        // UserServiceImpl implements UserService and is the actual @Service bean.
+        ProjectModel model = scan("ControllerInjectsInterface.java", "UserServiceImpl.java");
+        List<Diagnostic> diags = rule.analyze(model, graph(model));
+
+        assertThat(diags).isEmpty();
+    }
+
     // ── Code ─────────────────────────────────────────────────────────────────
 
     @Test
