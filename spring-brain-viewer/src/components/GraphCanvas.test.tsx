@@ -21,6 +21,7 @@ vi.mock('reactflow', () => {
     ReactFlowProvider: ({ children }: { children: ReactNode }) => <>{children}</>,
     useNodesState: (init: unknown[]) => [init, vi.fn(), vi.fn()],
     useEdgesState: (init: unknown[]) => [init, vi.fn(), vi.fn()],
+    useReactFlow: () => ({ fitView: vi.fn() }),
     Position: { Top: 'top', Bottom: 'bottom', Left: 'left', Right: 'right' },
     Handle: () => null,
     MarkerType: { ArrowClosed: 'arrowclosed' },

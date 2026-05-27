@@ -32,7 +32,7 @@ The graph is:
 ```json
 {
   "tool": "spring-brain",
-  "toolVersion": "0.1.0",
+  "toolVersion": "0.2.0",
   "projectName": "my-app",
   "generatedAt": "2026-01-01T12:00:00Z",
   "sourceMode": "static",
@@ -77,7 +77,7 @@ The graph is:
 | `repository` | Spring Data repository interface |
 | `entity` | JPA entity class |
 | `config_property` | Application config property key |
-| `bean` | Spring-managed bean used for generic dependency analysis |
+| `bean` | Generic Spring-managed bean (`@Component`, `@Configuration`, `@ControllerAdvice`, or any component discovered during bean dependency analysis). Overlaps with `controller`/`service`/`repository` in the graph when those nodes also carry `@Service` etc. |
 
 ## 8. Edge Types
 
@@ -99,7 +99,24 @@ The graph is:
 | Repository | `repository:{QUALIFIED_INTERFACE}` | `repository:com.example.UserRepository` |
 | Entity | `entity:{QUALIFIED_CLASS}` | `entity:com.example.User` |
 | Config | `config:{PROPERTY_KEY}` | `config:jwt.secret` |
-| Bean | `bean:{QUALIFIED_CLASS}` | `bean:com.example.UserService` |
+| Bean | `bean:{QUALIFIED_CLASS}` | `bean:com.example.BillingComponent` |
+
+### Route HTTP Method values
+
+`{HTTP_METHOD}` in route node IDs is one of:
+
+| Value | Source annotation |
+|-------|-------------------|
+| `GET` | `@GetMapping` or `@RequestMapping(method = RequestMethod.GET)` |
+| `POST` | `@PostMapping` or `@RequestMapping(method = RequestMethod.POST)` |
+| `PUT` | `@PutMapping` or `@RequestMapping(method = RequestMethod.PUT)` |
+| `PATCH` | `@PatchMapping` or `@RequestMapping(method = RequestMethod.PATCH)` |
+| `DELETE` | `@DeleteMapping` or `@RequestMapping(method = RequestMethod.DELETE)` |
+| `HEAD` | `@RequestMapping(method = RequestMethod.HEAD)` |
+| `OPTIONS` | `@RequestMapping(method = RequestMethod.OPTIONS)` |
+| `ANY` | `@RequestMapping` with no `method` attribute, or with multiple methods |
+
+`ANY` means the endpoint accepts all HTTP methods (or the specific set could not be statically determined).
 
 ## 10. Sorting Rules
 

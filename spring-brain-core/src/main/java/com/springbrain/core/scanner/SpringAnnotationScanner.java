@@ -244,7 +244,7 @@ public final class SpringAnnotationScanner {
         List<RouteModel> routes = new ArrayList<>();
         for (MethodDeclaration method : type.getMethods()) {
             for (AnnotationExpr ann : method.getAnnotations()) {
-                String httpMethod = toHttpMethod(ann.getNameAsString());
+                String httpMethod = toHttpMethod(ann);
                 if (httpMethod == null) {
                     continue;
                 }
@@ -259,16 +259,44 @@ public final class SpringAnnotationScanner {
         return routes;
     }
 
-    private static String toHttpMethod(String annotationName) {
-        return switch (annotationName) {
+    private static String toHttpMethod(AnnotationExpr ann) {
+        return switch (ann.getNameAsString()) {
             case "GetMapping" -> "GET";
             case "PostMapping" -> "POST";
             case "PutMapping" -> "PUT";
             case "PatchMapping" -> "PATCH";
             case "DeleteMapping" -> "DELETE";
-            case "RequestMapping" -> "GET";
+            case "RequestMapping" -> extractRequestMappingMethod(ann);
             default -> null;
         };
+    }
+
+    /**
+     * Reads the optional {@code method} attribute from {@code @RequestMapping}.
+     * Returns the detected HTTP verb or {@code "ANY"} when no method is specified
+     * or when multiple methods are listed (array initializer).
+     */
+    private static String extractRequestMappingMethod(AnnotationExpr ann) {
+        if (ann instanceof NormalAnnotationExpr nae) {
+            for (MemberValuePair pair : nae.getPairs()) {
+                if (!pair.getNameAsString().equals("method")) continue;
+                Expression methodValue = pair.getValue();
+                // Array: method = {RequestMethod.GET, RequestMethod.POST} → ANY
+                if (methodValue instanceof ArrayInitializerExpr array) {
+                    if (array.getValues().size() != 1) return "ANY";
+                    methodValue = array.getValues().get(0);
+                }
+                String value = methodValue.toString();
+                if (value.contains("POST")) return "POST";
+                if (value.contains("PUT")) return "PUT";
+                if (value.contains("PATCH")) return "PATCH";
+                if (value.contains("DELETE")) return "DELETE";
+                if (value.contains("HEAD")) return "HEAD";
+                if (value.contains("OPTIONS")) return "OPTIONS";
+                if (value.contains("GET")) return "GET";
+            }
+        }
+        return "ANY";
     }
 
     /**

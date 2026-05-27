@@ -6,12 +6,12 @@
 
     <groupId>com.springbrain</groupId>
     <artifactId>spring-brain</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
     <packaging>pom</packaging>
 
     <name>Spring Brain</name>
     <description>Spring Boot architecture intelligence tool</description>
-    <url>https://github.com/your-org/spring-brain</url>
+    <url>https://github.com/samuelhany-cpu/Spring-Brain</url>
 
     <modules>
         <module>spring-brain-core</module>

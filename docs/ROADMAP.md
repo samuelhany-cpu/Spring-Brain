@@ -1,41 +1,50 @@
 # Spring Brain — Roadmap
 
-## Phase 1 — MVP CLI *(current)*
+## Phase 1 — MVP CLI ✅ Complete
 
 Static scanner + `graph.json` + `diagnostics.json` + `summary.md`
 
 - [x] Milestone 0: Project bootstrap
-- [ ] Milestone 1: Static scanner
-- [ ] Milestone 2: Graph builder
-- [ ] Milestone 3: Broken link detector
-- [ ] Milestone 4: Summary report
-- [ ] Milestone 5: Release candidate
+- [x] Milestone 1: Static scanner (controllers, services, repos, entities, config properties)
+- [x] Milestone 2: Graph builder (nodes + edges + metadata)
+- [x] Milestone 3: Broken link detector (diagnostic rules engine)
+- [x] Milestone 4: Summary report (`summary.md` generator)
+- [x] Milestone 5: Release candidate (sample apps, integration tests)
 
 ---
 
-## Phase 2 — Interactive Viewer
+## Phase 2 — Interactive Viewer ✅ Complete
 
-React + TypeScript + Vite + React Flow graph viewer with:
-- Node details panel
-- Diagnostic panel
-- Endpoint lifecycle view
-- Filter by node type
-- Search by class/endpoint/entity
+React + TypeScript + Vite + React Flow graph viewer:
 
----
-
-## Phase 3 — Advanced Spring Analysis
-
-- Bean dependency graph - started
-- Circular dependency detection - started
-- Scheduled task mapping
-- Event publisher/listener mapping
-- Async method detection
-- External API client detection
+- [x] Node graph with dagre auto-layout
+- [x] Node details panel
+- [x] Diagnostic panel (errors + warnings)
+- [x] Filter by node type
+- [x] Search by class/endpoint
+- [x] Animated brain background
+- [x] Live WebSocket connection to Spring Brain server
+- [x] Click-to-zoom on nodes
 
 ---
 
-## Phase 4 — Security Intelligence
+## Phase 3 — Advanced Spring Analysis ⚠️ Experimental / In Progress
+
+Bean dependency graph and cycle detection are partially implemented.
+Results may include false positives for some project structures.
+
+- [x] Bean dependency graph (generic Spring bean nodes + `injects` edges)
+- [x] Circular dependency detection (rule implemented, experimental accuracy)
+- [ ] Scheduled task mapping (`@Scheduled`)
+- [ ] Event publisher/listener mapping (`@EventListener`)
+- [ ] Async method detection (`@Async`)
+- [ ] External API client detection (RestTemplate, WebClient, Feign)
+
+---
+
+## Phase 4 — Security Intelligence ✅ Complete (basic patterns)
+
+Simple static pattern matching — not a full security audit tool.
 
 - [x] Detect `@PreAuthorize`, `@Secured`, `@RolesAllowed`
 - [x] Parse simple chained `SecurityFilterChain` `requestMatchers(...)` rules
@@ -44,27 +53,25 @@ React + TypeScript + Vite + React Flow graph viewer with:
 
 ---
 
-## Phase 5 — AI Context Export
+## Phase 5 — AI Context Export 📋 Planned
 
 Generate context files for AI coding agents:
 - `SPRING_BRAIN_CONTEXT.md`
-- `CLAUDE.md`
-- `AGENTS.md`
+- `CLAUDE.md` / `AGENTS.md`
 - `.cursor/rules/spring-brain.mdc`
 - `.github/copilot-instructions.md`
 
 ---
 
-## Phase 6 — CI/CD Integration
+## Phase 6 — CI/CD Integration 📋 Planned
 
-- GitHub Action
-- `--fail-on-error` exit code 2
+- GitHub Action (publish to Marketplace)
 - PR comment summary
-- Architecture diff
+- Architecture diff between commits
 
 ---
 
-## Phase 7 — Branch Diff Mode
+## Phase 7 — Branch Diff Mode 📋 Planned
 
 Compare architecture before and after a change:
 - Added/removed endpoints
@@ -73,7 +80,7 @@ Compare architecture before and after a change:
 
 ---
 
-## Phase 8 — Auto-Fix Suggestions
+## Phase 8 — Auto-Fix Suggestions 📋 Planned
 
 Using OpenRewrite recipes:
 - Add missing service skeleton
@@ -82,22 +89,7 @@ Using OpenRewrite recipes:
 
 ---
 
-## Phase 9 — IDE Integration
+## Phase 9 — IDE Integration 📋 Planned
 
 - IntelliJ IDEA plugin
 - VS Code extension
-
----
-
-## Recommended Build Order
-
-```text
-1. MVP CLI
-2. React viewer
-3. AI context export
-4. GitHub Action
-5. Security analyzer
-6. Diff mode
-7. Auto-fixes
-8. IDE plugin
-```

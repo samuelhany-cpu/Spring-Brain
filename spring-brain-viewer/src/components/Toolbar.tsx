@@ -1,6 +1,6 @@
 import type { DiagnosticsReport, NodeType } from '../types'
 
-const ALL_TYPES: NodeType[] = ['route', 'controller', 'service', 'repository', 'entity', 'config_property']
+const ALL_TYPES: NodeType[] = ['route', 'controller', 'service', 'repository', 'entity', 'config_property', 'bean']
 const CHIP_LABELS: Record<string, string> = {
   route: 'Routes',
   controller: 'Controllers',
@@ -8,6 +8,7 @@ const CHIP_LABELS: Record<string, string> = {
   repository: 'Repos',
   entity: 'Entities',
   config_property: 'Configs',
+  bean: 'Beans',
 }
 
 interface Props {

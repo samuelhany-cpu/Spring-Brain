@@ -17,13 +17,13 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: 'java -jar ../spring-brain-cli/target/spring-brain-cli-0.1.0.jar serve --path ../spring-brain-samples/clean-crud-app --port 3000',
+      command: 'java -jar ../spring-brain-cli/target/spring-brain-cli-0.2.0.jar serve --path ../spring-brain-samples/clean-crud-app --port 3000',
       url: 'http://localhost:3000/api/graph',
       reuseExistingServer: !process.env.CI,
       timeout: 30000,
     },
     {
-      command: 'java -jar ../spring-brain-cli/target/spring-brain-cli-0.1.0.jar serve --path ../spring-brain-samples/broken-controller-direct-repository-app --port 3001',
+      command: 'java -jar ../spring-brain-cli/target/spring-brain-cli-0.2.0.jar serve --path ../spring-brain-samples/broken-controller-direct-repository-app --port 3001',
       url: 'http://localhost:3001/api/graph',
       reuseExistingServer: !process.env.CI,
       timeout: 30000,

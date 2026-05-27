@@ -1,5 +1,8 @@
 # Spring Brain
 
+[![CI](https://github.com/samuelhany-cpu/Spring-Brain/actions/workflows/ci.yml/badge.svg)](https://github.com/samuelhany-cpu/Spring-Brain/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 > Architecture intelligence for Spring Boot.
 
 Spring Brain is an open-source CLI tool that statically scans a Spring Boot codebase and generates an architecture report showing `Route → Controller → Service → Repository → Entity` flows, broken links, and architecture diagnostics.
@@ -22,21 +25,21 @@ Spring Brain is an open-source CLI tool that statically scans a Spring Boot code
 ### Build
 
 ```bash
-git clone https://github.com/your-org/spring-brain.git
-cd spring-brain
+git clone https://github.com/samuelhany-cpu/Spring-Brain.git
+cd Spring-Brain
 mvn package -DskipTests
 ```
 
 ### Run the CLI
 
 ```bash
-java -jar spring-brain-cli/target/spring-brain-cli-0.1.0.jar --help
+java -jar spring-brain-cli/target/spring-brain-cli-0.2.0.jar --help
 ```
 
 ### Scan a Spring Boot project
 
 ```bash
-java -jar spring-brain-cli/target/spring-brain-cli-0.1.0.jar scan --path ./spring-brain-samples/clean-crud-app
+java -jar spring-brain-cli/target/spring-brain-cli-0.2.0.jar scan --path ./spring-brain-samples/clean-crud-app
 ```
 
 ### Run Tests
@@ -54,7 +57,7 @@ mvn test
 Point `--path` at any Spring Boot project root:
 
 ```bash
-java -jar spring-brain-cli/target/spring-brain-cli-0.1.0.jar scan --path /path/to/your-spring-app
+java -jar spring-brain-cli/target/spring-brain-cli-0.2.0.jar scan --path /path/to/your-spring-app
 ```
 
 Example output printed to the terminal:
@@ -85,7 +88,7 @@ Output written to: /path/to/your-spring-app/.spring-brain
 ### Custom output directory
 
 ```bash
-java -jar spring-brain-cli/target/spring-brain-cli-0.1.0.jar scan \
+java -jar spring-brain-cli/target/spring-brain-cli-0.2.0.jar scan \
   --path /path/to/your-spring-app \
   --output /tmp/my-report
 ```
@@ -93,7 +96,7 @@ java -jar spring-brain-cli/target/spring-brain-cli-0.1.0.jar scan \
 ### Launch the interactive viewer
 
 ```bash
-java -jar spring-brain-cli/target/spring-brain-cli-0.1.0.jar serve \
+java -jar spring-brain-cli/target/spring-brain-cli-0.2.0.jar serve \
   --path /path/to/your-spring-app
 ```
 
@@ -101,12 +104,12 @@ Scans the project, starts a local HTTP server, and opens the browser at `http://
 
 ```bash
 # Custom port
-java -jar spring-brain-cli/target/spring-brain-cli-0.1.0.jar serve \
+java -jar spring-brain-cli/target/spring-brain-cli-0.2.0.jar serve \
   --path /path/to/your-spring-app \
   --port 8080
 
 # Or launch the viewer directly from the scan command
-java -jar spring-brain-cli/target/spring-brain-cli-0.1.0.jar scan \
+java -jar spring-brain-cli/target/spring-brain-cli-0.2.0.jar scan \
   --path /path/to/your-spring-app \
   --serve
 ```
@@ -116,7 +119,7 @@ Press `Ctrl+C` to stop the server.
 ### Fail the build on errors (CI usage)
 
 ```bash
-java -jar spring-brain-cli/target/spring-brain-cli-0.1.0.jar scan \
+java -jar spring-brain-cli/target/spring-brain-cli-0.2.0.jar scan \
   --path /path/to/your-spring-app \
   --fail-on-error
 ```
@@ -236,10 +239,34 @@ spring-brain/
 | 5 — Release Candidate | ✅ |
 | 6 — Interactive Viewer | ✅ |
 
-136 Java tests + 9 Playwright E2E tests pass. Produces `graph.json`, `diagnostics.json`, and `summary.md` from any Spring Boot source tree, and serves them in an interactive React Flow graph viewer.
+182 Java tests · 27 Vitest unit tests · 9 Playwright e2e tests pass. Produces `graph.json`, `diagnostics.json`, and `summary.md` from any Spring Boot source tree, and serves them in an interactive React Flow graph viewer.
+
+---
+
+## Current Limitations
+
+Spring Brain is an early-stage tool. Keep these constraints in mind:
+
+- **Static analysis only** — the target Spring Boot application is never started or executed.
+- **Scans `src/main/java` only** — generated sources, annotation-processed code, and Kotlin sources are not scanned.
+- **Java only** — Kotlin Spring Boot projects are not yet supported.
+- **Spring mapping detection is partial** — `@RequestMapping` without an explicit `method` attribute is reported as `ANY`. Complex composed annotations may be missed.
+- **Symbol resolution is approximate** — full classpath resolution is not performed; injection matching is done by simple class name.
+- **Config scanning covers `.properties` files and basic `.yml`/`.yaml` flat keys** — complex YAML anchors, references, and multi-document files are not supported.
+- **Bean dependency graph is experimental** — Phase 3 features may produce false positives on some project structures.
+- **Security analysis uses simple patterns only** — not a substitute for a real security audit.
+- **`serve` command requires the viewer to be built separately** — the server module is a work in progress.
+
+---
+
+## Contributing
+
+Contributions are welcome. Please open an issue first to discuss what you would like to change.
+
+Suggested GitHub topics: `spring-boot` `java` `static-analysis` `architecture` `cli` `developer-tools` `graph` `diagnostics`
 
 ---
 
 ## License
 
-MIT
+[MIT](LICENSE)

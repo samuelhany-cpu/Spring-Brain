@@ -7,8 +7,8 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
-    name: Build and Test
+  backend:
+    name: Backend — Maven Test
     runs-on: ubuntu-latest
 
     steps:
@@ -34,3 +34,30 @@ jobs:
             spring-brain-core/target/surefire-reports/
             spring-brain-cli/target/surefire-reports/
           retention-days: 7
+
+  frontend:
+    name: Frontend — Viewer Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: spring-brain-viewer/package-lock.json
+
+      - name: Install dependencies
+        working-directory: spring-brain-viewer
+        run: npm ci
+
+      - name: Build
+        working-directory: spring-brain-viewer
+        run: npm run build
+
+      - name: Unit tests
+        working-directory: spring-brain-viewer
+        run: npm run test

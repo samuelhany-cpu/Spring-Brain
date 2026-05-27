@@ -449,4 +449,51 @@ class SpringAnnotationScannerTest {
                         && rule.getLine() > 0
                         && rule.getSource().equals("SecurityFilterChain"));
     }
+
+    // ── @RequestMapping HTTP method inference ─────────────────────────────────
+
+    @Test
+    void requestMappingWithoutMethodAttributeProducesAny() throws Exception {
+        ProjectModel model = scanFixture("MappingMethodController.java");
+
+        List<RouteModel> routes = model.getControllers().get(0).getRoutes();
+        assertThat(routes).anyMatch(r ->
+                r.getHttpMethod().equals("ANY") && r.getPath().equals("/any-endpoint"));
+    }
+
+    @Test
+    void requestMappingWithPostMethodProducesPost() throws Exception {
+        ProjectModel model = scanFixture("MappingMethodController.java");
+
+        List<RouteModel> routes = model.getControllers().get(0).getRoutes();
+        assertThat(routes).anyMatch(r ->
+                r.getHttpMethod().equals("POST") && r.getPath().equals("/post-endpoint"));
+    }
+
+    @Test
+    void requestMappingWithDeleteMethodProducesDelete() throws Exception {
+        ProjectModel model = scanFixture("MappingMethodController.java");
+
+        List<RouteModel> routes = model.getControllers().get(0).getRoutes();
+        assertThat(routes).anyMatch(r ->
+                r.getHttpMethod().equals("DELETE") && r.getPath().equals("/delete-endpoint"));
+    }
+
+    @Test
+    void requestMappingWithMultipleMethodsProducesAny() throws Exception {
+        ProjectModel model = scanFixture("MappingMethodController.java");
+
+        List<RouteModel> routes = model.getControllers().get(0).getRoutes();
+        assertThat(routes).anyMatch(r ->
+                r.getHttpMethod().equals("ANY") && r.getPath().equals("/multi-endpoint"));
+    }
+
+    @Test
+    void requestMappingWithSingleElementArrayProducesMethod() throws Exception {
+        ProjectModel model = scanFixture("MappingMethodController.java");
+
+        List<RouteModel> routes = model.getControllers().get(0).getRoutes();
+        assertThat(routes).anyMatch(r ->
+                r.getHttpMethod().equals("PUT") && r.getPath().equals("/single-array-endpoint"));
+    }
 }

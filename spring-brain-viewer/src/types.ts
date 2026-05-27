@@ -5,6 +5,7 @@ export type NodeType =
   | 'repository'
   | 'entity'
   | 'config_property'
+  | 'bean'
 
 export type LiveStatus = 'connected' | 'reconnecting'
 
