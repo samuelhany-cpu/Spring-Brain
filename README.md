@@ -5,7 +5,22 @@
 
 > Architecture intelligence for Spring Boot.
 
-Spring Brain is an open-source CLI tool that statically scans a Spring Boot codebase and generates an architecture report showing `Route → Controller → Service → Repository → Entity` flows, broken links, and architecture diagnostics.
+Spring Brain is an open-source CLI tool that statically scans Java-based Spring Boot source code and generates an architecture report showing `Route → Controller → Service → Repository → Entity` flows, broken links, and architecture diagnostics.
+
+## Engineering walkthrough
+
+This project is designed as a **CLI-first, static-analysis tool**: it inspects source without starting the target application. For a technical review:
+
+1. **Start with the architecture:** [design and module responsibilities](docs/ARCHITECTURE.md), including the scanner → graph builder → rule engine → export pipeline.
+2. **Inspect the implementation:** [core scanner and diagnostics](spring-brain-core), [CLI entry point](spring-brain-cli), and the [React graph viewer](spring-brain-viewer).
+3. **Review correctness checks:** [diagnostic rules](docs/DIAGNOSTIC_RULES.md), [sample Spring Boot projects](spring-brain-samples), and [CI test/build workflow](.github/workflows/ci.yml).
+
+### Design decisions and trade-offs
+
+- **Static analysis instead of running the app:** safer and easier to use on unfamiliar codebases; the trade-off is incomplete symbol resolution and possible false positives.
+- **Graph JSON as an intermediate format:** keeps scanning/report generation separate from UI visualization.
+- **Independent diagnostic rules:** allows adding checks without coupling every rule to the CLI.
+- **Explicit limitations:** focuses on Java sources under `src/main/java`; Kotlin, generated code, and some complex Spring wiring patterns aren't fully covered. See [Current Limitations](#current-limitations).
 
 ---
 
@@ -239,7 +254,7 @@ spring-brain/
 | 5 — Release Candidate | ✅ |
 | 6 — Interactive Viewer | ✅ |
 
-182 Java tests · 27 Vitest unit tests · 9 Playwright e2e tests pass. Produces `graph.json`, `diagnostics.json`, and `summary.md` from any Spring Boot source tree, and serves them in an interactive React Flow graph viewer.
+The project includes Java, Vitest, and Playwright test suites. The CI workflow runs Maven tests plus the viewer build and unit tests; Playwright tests are available through the viewer's `test:e2e` script. The scanner writes `graph.json`, `diagnostics.json`, and `summary.md` from supported Java-based Spring Boot source trees, and the CLI can launch a locally built interactive graph viewer.
 
 ---
 
